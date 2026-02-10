@@ -14,4 +14,9 @@ Aspire scope: A pretty UI, diffrent tamber/instrument
 
 
 ## Time Line: 
-
+- Inital Project Propsal - Feb 12th 
+- Softwear Requiremt - Feb 26th 
+- Softwear Design Report - March 26th 
+- Softwear Test Plan - April 16th
+- Softwear Documentaition - May 7th
+- Final Presentation - May 12th???
