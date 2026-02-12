@@ -6,7 +6,10 @@ In order to add to the opitons of music creation we will be creating a digital s
 We firmly belive that the ability to make music should be open and accible to all. Through our own personal experince and our education here at Ursinus we have found music and independat music production to be an important part of our histories and our current lives. This project would contribute to the traditon of open and creative music making, allowing for more people to create new and exciting new music. 
 
 ## Scope
-We need keys that play notes. User configurabilty using either wave forms or presets. Noise should be both recorded and out put. 
+
+### Minimal Viable Product
+Using the standard english keyboard, a user will be able to at least play the 12 notes of a wester chromatic scale in equal temperment. Additonaly, a user will be able to asign ocillation by inputing numbers. All of this will be configurable, either by coustoms numbers, or using a preset. Our preset will be based on common use cases, like tuing by fifths or fourths to better work with acoustic instruments, or maybe common apregios like pentatonic scales. 
+All of this will be able to be both heard through a laptop, and recorded as a file to your computer. 
 
 ### Aspire scope: 
 A pretty UI, diffrent tamber/instrument
