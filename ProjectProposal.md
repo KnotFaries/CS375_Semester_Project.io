@@ -5,6 +5,9 @@ In order to add to the options of music creation we will be creating a digital s
 
 We firmly believe that the ability to make music should be open and accessible to all. Through our own personal experience and our education here at Ursinus we have found music and independent music production to be an important part of our histories and our current lives. This project would contribute to the tradition of open and creative music making, allowing for more people to create new and exciting new music. 
 
+### Stakeholders:
+-muscians, create it to be accessble? 
+
 ## Scope
 
 ### Minimal Viable Product
@@ -25,3 +28,10 @@ Our current plan is to write the bulk of the code in python, which we are all ca
 - Software Test Plan - April 16th
 - Software Documentation - May 7th
 - Final Presentation - May 12th???
+
+## Time Comittment Estimations: 
+- Reacuring 1 hour meetings outside of class once a week. 
+- Keyboard 2-3 hours 
+- configureabily via wave forms 2-3 hours
+- presets 2-3 hours
+- save and record feature 3-4 hours 
