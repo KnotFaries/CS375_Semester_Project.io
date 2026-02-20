@@ -18,7 +18,7 @@ All of this will be able to be both heard through a laptop, and recorded as a fi
 A pretty UI, different timber/instrument
 
 ## Technical Specs
-Our current plan is to write the bulk of the code in python, which we are all capable of. Two of our group member have a musical background. 
+Our current plan is to write the bulk of the code in python, which we are all capable of. Two of our group members have a musical background. 
 
 ## Group Roles: 
 Maia - Project Lead
