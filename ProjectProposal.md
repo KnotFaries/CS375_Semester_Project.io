@@ -6,7 +6,7 @@ In order to add to the options of music creation we will be creating a digital s
 We firmly believe that the ability to make music should be open and accessible to all. Through our own personal experience and our education here at Ursinus we have found music and independent music production to be an important part of our histories and our current lives. This project would contribute to the tradition of open and creative music making, allowing for more people to create new and exciting new music. 
 
 ### Stakeholders:
-Our stakeholder is Ash Hawkes (ashawkes@ursinus.edu). They represnt the section of music hobbiest who might not have classical traning in music, but are very intresting in trying their hand at music creation. They are able to give feedback about usability, direction of important features, and overall understanding of what a person may be looking for in a product such as our own. 
+Our stakeholder is Ash Hawkes (ashawkes@ursinus.edu). They represent the section of music hobbiest who might not have classical training in music, but are very intrested in trying their hand at music creation. They are able to give feedback about usability, direction of important features, and overall understanding of what a person may be looking for in a product such as our own. 
 
 ## Scope
 
