@@ -5,6 +5,9 @@ In order to add to the options of music creation we will be creating a digital s
 
 We firmly believe that the ability to make music should be open and accessible to all. Through our own personal experience and our education here at Ursinus we have found music and independent music production to be an important part of our histories and our current lives. This project would contribute to the tradition of open and creative music making, allowing for more people to create new and exciting new music. 
 
+### Stakeholders:
+Our stakeholder is Ash Hawkes (ashawkes@ursinus.edu). They represnt the section of music hobbiest who might not have classical traning in music, but are very intresting in trying their hand at music creation. They are able to give feedback about usability, direction of important features, and overall understanding of what a person may be looking for in a product such as our own. 
+
 ## Scope
 
 ### Minimal Viable Product
@@ -17,6 +20,15 @@ A pretty UI, different timber/instrument
 ## Technical Specs
 Our current plan is to write the bulk of the code in python, which we are all capable of. Two of our group members have a musical background. 
 
+## Group Roles: 
+Maia - Project Lead
+
+Brian - Document Lead
+
+Izayah - Scrum lead
+
+Evan - Code Lead
+
 
 ## Time Line: 
 - Initial Project Proposal - Feb 12th 
@@ -25,3 +37,11 @@ Our current plan is to write the bulk of the code in python, which we are all ca
 - Software Test Plan - April 16th
 - Software Documentation - May 7th
 - Final Presentation - May 12th???
+
+## Time Comittment Estimations: 
+- Sprints are on a weekly basis
+- Reacuring 1 hour meetings outside of class once a week. 
+- Keyboard 2-3 hours 
+- configureabily via wave forms 2-3 hours
+- presets 2-3 hours
+- save and record feature 3-4 hours 
