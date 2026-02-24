@@ -2,11 +2,11 @@
 
 ## Press Relase: 
 
-Comming from a librial arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Therefore our project is the creation of a tool for music production that will lower the bar of entry for creatvie play. 
+Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Therefore our project is the creation of a tool for music production that will lower the bar of entry for creative play. 
 
-What we will create is a free synthsiser, that can run on low end computers such as student laptops. Aspireing artist will have access to all the notes of a standard piano, as well as the free pitch sounds of ocilaters. 
+What we will create is a free synthesizer, that can run on low end computers such as student laptops. Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 
-## Functional Requirments
+## Functional Requirements
 - record audio files
 - play audio through laptop's sound system. 
 - Produce 12 notes of a western chromatic scale in equal temperament
