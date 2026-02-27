@@ -32,4 +32,5 @@ As a musican, I want to play with sound.
 - The product will be able to run on lower end computers. 
 - Our product should act and look the same over time.
 
-
+## Gant Chart
+![Picture1](https://github.com/user-attachments/assets/d8641e8b-5fd6-4580-9495-028e9d2b85a2)
