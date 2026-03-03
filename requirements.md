@@ -13,25 +13,21 @@ Comming from a liberal arts education, we have decided that world is shaped by t
 
 What we will create is a free synthesizer, that can run on low end computers such as student laptops. Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 ## User Stories: 
-As a musican I want to use the equipment I already own. 
-
-As a musican without formal training, I want to be able still make good sounding music. 
-
-As a musican I want to be able to hear my work. 
-
-As an American musican, I want familar note intervals. 
-
-As a musican, I want to play with sound. 
+1. As a musican I want to use the equipment I already own. 
+2. As a musican without formal training, I want to be able still make good sounding music. 
+3. As a musican I want to be able to hear my work. 
+4. As an American musican, I want familar note intervals. 
+5. As a musican, I want to play with sound. 
 
 ## Functional Requirements
-- Able to export audio via mp3 file. 
-- play audio through laptop's sound system. 
-- Produce 12 notes of a western chromatic scale in equal temperament
-- Utilizes 2 or 3 oscillators to synthesize multiple frequencies
-- Can amplify the frequencies and convert them to sound
-- Untilize presets:
+- US 3: Able to export audio via mp3 file. 
+- US 1: play audio through laptop's sound system. 
+- US 4: Produce 12 notes of a western chromatic scale in equal temperament
+- US 5:Utilizes 2 or 3 oscillators to synthesize multiple frequencies
+- US 5: Can amplify the frequencies and convert them to sound
+- US 6: Untilize presets:
     - Move between chromatic and pentatonic scale
-- Utilizes filters, LFOs and envelopes for timbral construction
+- US 5: Utilizes filters, LFOs and envelopes for timbral construction
 
 ## Nonfunctional Requirments
 - Features can be accessed through a UI with adjustable sliders/knobs.
