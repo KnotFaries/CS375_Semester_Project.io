@@ -1,17 +1,9 @@
 # Requirements: 
-Is it a desktop application?  
-What are the file formats that the application will support?  
-What are the pre-sets that you refer to in one of the functional requirements? 
-But, primarily, there is no traceability from functional requirements to user stories.  You listed out functional requirements, and then you listed out user stories that appear to be unrelated to the functional requirements.
-Stakeholder Feedback and Analysis (30%): Pre-Emerging 0 Missing Completely vague and mostly non-testable.  
-What is a lower-end computer?  
-I am not sure what "Our product should act and look the same over time" means.  
-Some of the items listed as non-functional requirements are not non-functional at all, they are functional requirements related to user inputs.
 ## Press Relase: 
-
 Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, uniqe and unabashedly human music. 
 
 What we will create is a free synthesizer, that can run on low end computers such as student laptops. Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
+
 ## User Stories: 
 1. As a musican I want to use the equipment I already own. 
 2. As a musican without formal training, I want to be able still make good sounding music. 
@@ -23,17 +15,19 @@ What we will create is a free synthesizer, that can run on low end computers suc
 - US 3: Able to export audio via mp3 file. 
 - US 1: play audio through laptop's sound system. 
 - US 4: Produce 12 notes of a western chromatic scale in equal temperament
-- US 5:Utilizes 2 or 3 oscillators to synthesize multiple frequencies
+- US 5: Utilizes 2 or 3 oscillators to synthesize multiple frequencies
 - US 5: Can amplify the frequencies and convert them to sound
 - US 6: Untilize presets:
     - Move between chromatic and pentatonic scale
 - US 5: Utilizes filters, LFOs and envelopes for timbral construction
+- desktop application 
 
 ## Nonfunctional Requirments
 - Features can be accessed through a UI with adjustable sliders/knobs.
     - Prototype UI will be typing in numbers
 - Features can be accessed through a standard english keyboard. 
-- The product will be able to run on lower end computers. 
+- US 1: The product will be able to run on lower end computers. 
+    - Low ram, slow cpu 
 - Features should not be taken away over time. 
 - Features should be accessed by users in the same way over time 
 
