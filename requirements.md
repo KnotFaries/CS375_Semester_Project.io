@@ -1,5 +1,13 @@
 # Requirements: 
-
+Is it a desktop application?  
+What are the file formats that the application will support?  
+What are the pre-sets that you refer to in one of the functional requirements? 
+But, primarily, there is no traceability from functional requirements to user stories.  You listed out functional requirements, and then you listed out user stories that appear to be unrelated to the functional requirements.
+Stakeholder Feedback and Analysis (30%): Pre-Emerging 0 Missing Completely
+vague and mostly non-testable.  
+What is a lower-end computer?  
+I am not sure what "Our product should act and look the same over time" means.  
+Some of the items listed as non-functional requirements are not non-functional at all, they are functional requirements related to user inputs.
 ## Press Relase: 
 
 Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, uniqe and unabashedly human music. 
