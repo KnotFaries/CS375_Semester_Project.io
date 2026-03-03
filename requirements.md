@@ -3,8 +3,7 @@ Is it a desktop application?
 What are the file formats that the application will support?  
 What are the pre-sets that you refer to in one of the functional requirements? 
 But, primarily, there is no traceability from functional requirements to user stories.  You listed out functional requirements, and then you listed out user stories that appear to be unrelated to the functional requirements.
-Stakeholder Feedback and Analysis (30%): Pre-Emerging 0 Missing Completely
-vague and mostly non-testable.  
+Stakeholder Feedback and Analysis (30%): Pre-Emerging 0 Missing Completely vague and mostly non-testable.  
 What is a lower-end computer?  
 I am not sure what "Our product should act and look the same over time" means.  
 Some of the items listed as non-functional requirements are not non-functional at all, they are functional requirements related to user inputs.
@@ -25,12 +24,13 @@ As an American musican, I want familar note intervals.
 As a musican, I want to play with sound. 
 
 ## Functional Requirements
-- record audio files
+- Able to export audio via mp3 file. 
 - play audio through laptop's sound system. 
 - Produce 12 notes of a western chromatic scale in equal temperament
 - Utilizes 2 or 3 oscillators to synthesize multiple frequencies
 - Can amplify the frequencies and convert them to sound
-- quickly move back to various pre-sets
+- Untilize presets:
+    - Move between chromatic and pentatonic scale
 - Utilizes filters, LFOs and envelopes for timbral construction
 
 ## Nonfunctional Requirments
@@ -38,7 +38,8 @@ As a musican, I want to play with sound.
     - Prototype UI will be typing in numbers
 - Features can be accessed through a standard english keyboard. 
 - The product will be able to run on lower end computers. 
-- Our product should act and look the same over time.
+- Features should not be taken away over time. 
+- Features should be accessed by users in the same way over time 
 
 ## Gant Chart
 ![Picture1](https://github.com/user-attachments/assets/d8641e8b-5fd6-4580-9495-028e9d2b85a2)
