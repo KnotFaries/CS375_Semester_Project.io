@@ -4,6 +4,9 @@ Comming from a liberal arts education, we have decided that world is shaped by t
 
 What we will create is a free synthesizer, that can run on low end computers such as student laptops. Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 
+## Interviews: 
+[ Inital Interview with Ash Hawkes](https://drive.google.com/file/d/12T3JomlqMWkhvdudFzyKspx-jlWIuCh7/view?usp=sharing)
+
 ## User Stories: 
 1. As a musican I want to use the equipment I already own. 
 2. As a musican without formal training, I want to be able still make good sounding music. 
