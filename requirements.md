@@ -2,7 +2,7 @@
 ## Press Relase: 
 Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, uniqe and unabashedly human music. 
 
-What we will create is a free synthesizer, that can run on low end computers such as student laptops. Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
+What we will create is a free synthesizer, that can run on low end computers such as student laptops (AMD Ryzen 5/ Intel I5 cpu and about 8 gigs of ram.) Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 
 ## Interviews: 
 [ Inital Interview with Ash Hawkes](https://drive.google.com/file/d/12T3JomlqMWkhvdudFzyKspx-jlWIuCh7/view?usp=sharing)
@@ -26,13 +26,21 @@ What we will create is a free synthesizer, that can run on low end computers suc
 - desktop application 
 
 ## Nonfunctional Requirments
-- Features can be accessed through a UI with adjustable sliders/knobs.
-    - Prototype UI will be typing in numbers
-- Features can be accessed through a standard english keyboard. 
-- US 1: The product will be able to run on lower end computers. 
-    - Low ram, slow cpu 
-- Features should not be taken away over time. 
-- Features should be accessed by users in the same way over time 
+- The user interface should allow users to control parameters through intuitive sliders and knobs.
+- Export audio player can be accessed through a standard english keyboard 
+- US 1 4 5: These features must be optomized for an intel core i5/ ryzen 5 or higher\
+- Users should be able to learn basic functionality within 5 minutes without documentation.
+- The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
+- The application should support standard laptop audio hardware and drivers.
+- The desktop application should run on Windows 10 or later
+- The synthesizer should not exceed:
+    20% CPU usage during normal operation
+    500 MB of RAM
+- The architecture should allow future support for:
+    Additional oscillators
+    More musical scales
+    MIDI input
+    Additional filter types
 
 ## Gant Chart
 ![Picture1](https://github.com/user-attachments/assets/d8641e8b-5fd6-4580-9495-028e9d2b85a2)
