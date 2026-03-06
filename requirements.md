@@ -12,7 +12,8 @@ What we will create is a free synthesizer, that can run on low end computers suc
 2. As a musican without formal training, I want to be able still make good sounding music. 
 3. As a musican I want to be able to hear my work. 
 4. As an American musican, I want familar note intervals. 
-5. As a musican, I want to play with sound. 
+5. As a musican, I want to play with sound.
+6. As somone new to music, I want a shape (wave) based UI 
 
 ## Functional Requirements
 - US 3: Able to export audio via mp3 file. 
