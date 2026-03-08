@@ -1,8 +1,15 @@
 # Assignmet
-In your design report, include a summary of your project goals and requirements from the prior reports.
-
-Then, for each requirement, specify a software design (either a microservice, or design pattern) that accomplishes that requirement in a modular, abstract, and/or isolated way.
-
-Each method or microservice should include a list of pre- and post-conditions that will serve as your unit tests and acceptance tests to be discussed later in subsequent plans. List each of these methods within your class or microservice design along with a UML diagram describing each. You should specify which requirements keys each method, class, or microservice accomplishes. If you find that a particular code module attempts to accomplish too many requirements, this may be a sign that you should consider breaking this design into smaller components. Provide a schema for any database or cloud data storage.
-
-Finally, for each requirement, show a flowchart that describes the trace through the services and components of your software system that are exercised by that requirement. Ideally, this will be a relatively small trace for each requirement.
+## Requirments:
+1) The user interface should allow users to control parameters through intuitive sliders and knobs.
+2) Export audio player can be accessed through a standard english keyboard 
+3) These features must be optomized for an intel core i5/ ryzen 5 or higher\
+4) Users should be able to learn basic functionality within 5 minutes without documentation.
+5) The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
+6) The application should support standard laptop audio hardware and drivers.
+7) The desktop application should run on Windows 10 or later
+8) The synthesizer should not exceed: 20% CPU usage during normal operation
+9) The synthesizer should not exceed 500 MB of RAM
+10) The architecture should allow future support for Additional oscillators
+11) The architecture should allow future support for More musical scales
+12) The architecture should allow future support for MIDI input
+13) The architecture should allow future support for Additional filter types
