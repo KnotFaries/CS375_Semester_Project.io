@@ -31,7 +31,7 @@ Ash is is musical, but not formaly trained. They are looking for a intuitive int
 ## Nonfunctional Requirments
 - US 6 The user interface should allow users to control parameters through intuitive sliders and knobs.
 - Export audio player can be accessed through a standard english keyboard 
-- US 1 4 5: These features must be optomized for an intel core i5/ ryzen 5 or higher\
+- US 1 4 5: These features must be optomized for an intel core i5/ ryzen 5 or higher
 - US 6 Users should be able to learn basic functionality within 5 minutes without documentation.
 - US 1 The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
 - US 1 The application should support standard laptop audio hardware and drivers.
