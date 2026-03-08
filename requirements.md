@@ -15,7 +15,7 @@ Ash is is musical, but not formaly trained. They are looking for a intuitive int
 3. As a musican I want to be able to hear my work. 
 4. As an American musican, I want familar note intervals. 
 5. As a musican, I want to play with sound.
-6. As somone new to music, I want a shape (wave) based UI 
+6. As somone new to music, I want an accessible interface
 
 ## Functional Requirements
 - US 3: Able to export audio via mp3 file. 
@@ -29,17 +29,17 @@ Ash is is musical, but not formaly trained. They are looking for a intuitive int
 - desktop application 
 
 ## Nonfunctional Requirments
-- The user interface should allow users to control parameters through intuitive sliders and knobs.
+- US 6 The user interface should allow users to control parameters through intuitive sliders and knobs.
 - Export audio player can be accessed through a standard english keyboard 
 - US 1 4 5: These features must be optomized for an intel core i5/ ryzen 5 or higher\
-- Users should be able to learn basic functionality within 5 minutes without documentation.
-- The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
-- The application should support standard laptop audio hardware and drivers.
-- The desktop application should run on Windows 10 or later
-- The synthesizer should not exceed:
+- US 6 Users should be able to learn basic functionality within 5 minutes without documentation.
+- US 1 The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
+- US 1 The application should support standard laptop audio hardware and drivers.
+- US 1 The desktop application should run on Windows 10 or later
+- US 1 The synthesizer should not exceed:
     20% CPU usage during normal operation
     500 MB of RAM
-- The architecture should allow future support for:
+-US 5 The architecture should allow future support for:
     Additional oscillators
     More musical scales
     MIDI input
