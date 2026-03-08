@@ -7,6 +7,8 @@ What we will create is a free synthesizer, that can run on low end computers suc
 ## Interviews: 
 [ Inital Interview with Ash Hawkes](https://drive.google.com/file/d/12T3JomlqMWkhvdudFzyKspx-jlWIuCh7/view?usp=sharing)
 
+Ash is is musical, but not formaly trained. They are looking for a intuitive interface that aligns with how they conceptualize music (As waves and textures) and work with costmoizeable sets of pitches and flowing glisandos. 
+
 ## User Stories: 
 1. As a musican I want to use the equipment I already own. 
 2. As a musican without formal training, I want to be able still make good sounding music. 
