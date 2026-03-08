@@ -23,7 +23,7 @@ Ash is is musical, but not formaly trained. They are looking for a intuitive int
 - US 4: Produce 12 notes of a western chromatic scale in equal temperament
 - US 5: Utilizes 2 or 3 oscillators to synthesize multiple frequencies
 - US 5: Can amplify the frequencies and convert them to sound
-- US 6: Untilize presets:
+- US 2: Untilize presets:
     - Move between chromatic and pentatonic scale
 - US 5: Utilizes filters, LFOs and envelopes for timbral construction
 - desktop application 
