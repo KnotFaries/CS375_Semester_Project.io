@@ -1,4 +1,4 @@
-# Assignmet
+# Assignment
 In your design report, include a summary of your project goals and requirements from the prior reports.
 
 Then, for each requirement, specify a software design (either a microservice, or design pattern) that accomplishes that requirement in a modular, abstract, and/or isolated way.
