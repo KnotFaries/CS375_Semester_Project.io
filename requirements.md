@@ -1,13 +1,13 @@
 # Requirements: 
 ## Press Relase: 
-Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, uniqe and unabashedly human music. 
+Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, unique and unabashedly human music. 
 
 What we will create is a free synthesizer, that can run on low end computers such as student laptops (AMD Ryzen 5/ Intel I5 cpu and about 8 gigs of ram.) Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 
 ## Interviews: 
 [ Inital Interview with Ash Hawkes](https://drive.google.com/file/d/12T3JomlqMWkhvdudFzyKspx-jlWIuCh7/view?usp=sharing)
 
-Ash is is musical, but not formaly trained. They are looking for a intuitive interface that aligns with how they conceptualize music (As waves and textures) and work with costmoizeable sets of pitches and flowing glisandos. 
+Ash is musical, but not formaly trained. They are looking for a intuitive interface that aligns with how they conceptualize music (As waves and textures) and work with costmoizeable sets of pitches and flowing glisandos. 
 
 ## User Stories: 
 1. As a musican I want to use the equipment I already own. 
