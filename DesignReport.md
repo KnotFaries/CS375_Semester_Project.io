@@ -26,8 +26,19 @@
 ## UI
 Modules which are about the UI and resolve requriments 
 
+Class Key Input
+
 ## Sound Production 
 Moduels which are about the production of noise and resolve requriments 
+
+Audio Input class: 
+- Calcuate Solfege, input home_tone, output list of frequencies 
+- Assign to Computer_keyboards, input list of frequenices, output void
+
+Oscillater class
+- Method: Generate wave function(inputp: frequnices (float) output: freqiesces (float))
+
+Tamber class (Might split later)
 
 ## Others 
 Modules which can not be grouped, resolve requrment 
