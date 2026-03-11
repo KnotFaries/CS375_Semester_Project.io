@@ -33,11 +33,11 @@ Tutorial Pages (multpile classes)
 ## Sound Production 
 Moduels which are about the production of noise and resolve requriments 
 
-Audio Input class: 
+Audio Input class: (Reqirements 1, 2)
 - Calcuate Solfege, input home_tone, output list of frequencies 
 - Assign to Computer_keyboards, input list of frequenices, output void
 
-Oscillater class
+Oscillater class (requirements 3, 4, 5)
 - Method: Generate wave function(inputp: frequnices (float) output: freqiesces (float))
 
 Evelopes/Volume Class
