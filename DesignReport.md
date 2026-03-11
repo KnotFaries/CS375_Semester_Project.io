@@ -28,14 +28,32 @@ Modules which are about the UI and resolve requriments
 
 Class Key Input
 
-Tutorial Pages (multpile classes)
+## Tutorial Pages (multpile classes)
 
 ## Sound Production 
-Moduels which are about the production of noise and resolve requriments 
+Moduels which are about the production of noise
 
-Audio Input class: (Reqirements 1, 2)
-- Calcuate Solfege, input home_tone, output list of frequencies 
-- Assign to Computer_keyboards, input list of frequenices, output void
+**Audio Input class: (Reqirements 1, 2)**
+
+Methods
+- Calcuate_Solfege
+    - Inputs 
+        - home_tone: float
+        - mode: String (defult = major)
+    - Output 
+        - frequency_list: list/array
+- Assign to Computer_keyboards 
+    - input 
+        - frequency_list: list/array
+    - output 
+        - void
+- Preconditons: 
+    - home_tone NOT NULL
+    - Caclulate_Solfege outputs 8 unique frequiencies
+    - The keyboard has been assigned to diffrent notes. 
+- Postconitons (success)
+    - Calculate_Solfege out puts a number of frequeineces that is not 8 
+- Postcondtions(fail)
 
 Oscillater class (requirements 3, 4, 5)
 - Switch to preset input key (string) out put list of frequencies
