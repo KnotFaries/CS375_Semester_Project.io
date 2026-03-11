@@ -52,12 +52,25 @@ Methods
     - Caclulate_Solfege outputs 8 unique frequiencies
     - The keyboard has been assigned to diffrent notes. 
 - Postconitons (success)
-    - Calculate_Solfege out puts a number of frequeineces that is not 8 
+    - Calculate_Solfege out puts a number of frequeineces that is not 8
+    - The computer keys are assigned new numbers and accending order 
 - Postcondtions(fail)
+    - Calculate_Solfege ouptputs a number of frequencies that is not 8 
+    - The computer keys are not assgined new numbers
+    - The computer key are assigned number in a non- accending order. 
 
 Oscillater class (requirements 3, 4, 5)
-- Switch to preset input key (string) out put list of frequencies
-- Method: Generate wave function(inputp: frequnices (float) output: freqiesces (float))
+Method: 
+- Switch to preset 
+    - input 
+        - key (string)
+    - out put l
+        - list of frequencies
+- Generate wave function
+    - input: 
+        - frequnices (float) 
+    - output: 
+        - freqiesces (float)
 
 Evelopes/Volume Class
 
