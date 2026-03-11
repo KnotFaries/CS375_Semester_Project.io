@@ -38,6 +38,7 @@ Audio Input class: (Reqirements 1, 2)
 - Assign to Computer_keyboards, input list of frequenices, output void
 
 Oscillater class (requirements 3, 4, 5)
+- Switch to preset input key (string) out put list of frequencies
 - Method: Generate wave function(inputp: frequnices (float) output: freqiesces (float))
 
 Evelopes/Volume Class
