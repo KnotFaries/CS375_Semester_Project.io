@@ -63,14 +63,14 @@ Oscillater class (requirements 3, 4, 5)
 Method: 
 - Switch to preset 
     - input 
-        - key (string)
+        - key: string
     - out put l
-        - list of frequencies
+        - list_of_frequencies: list/array
 - Generate wave function
     - input: 
-        - frequnices (float) 
+        - frequnices: float
     - output: 
-        - freqiesces (float)
+        - freqiesces: float
 
 Evelopes/Volume Class
 
