@@ -36,6 +36,40 @@ Moduels which are about the production of noise
 **Generate Audio Data classes: (Reqirements 1, 2)**
 Methods that generate the audio data
 
+Evelopes/Volume/ Class
+
+Methods: 
+- Generate Attack 
+    - input
+    - output 
+- Generate Decay 
+    - input
+    - output 
+- Generate sustain
+    - input
+    - output 
+- Generate Relase
+    - input
+    - output 
+
+Overtones Class: 
+
+Atributes: 
+- Fundmental: Float 
+
+Methods: 
+- generate_harmonics
+- generate_overtones
+- fetch_overtones
+    - Input: 
+        - Instrument: String
+    - Output
+        - 
+
+
+Take a funtmetal, calculate the harmonics, caluate the overtones, lower notes: more harmonics(tighter space?), Higher notes: Less harmonics 
+
+
 Oscillater class (requirements 3, 4, 5)
 Method: 
 - Switch to preset 
@@ -49,7 +83,7 @@ Method:
     - output: 
         - freqiesces: float
 
-Evelopes/Volume Class
+
 
 Filter Class
 
