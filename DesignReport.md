@@ -33,7 +33,29 @@ Class Key Input
 ## Sound Production 
 Moduels which are about the production of noise
 
-**Audio Input class: (Reqirements 1, 2)**
+**Generate Audio Data classes: (Reqirements 1, 2)**
+Methods that generate the audio data
+
+Oscillater class (requirements 3, 4, 5)
+Method: 
+- Switch to preset 
+    - input 
+        - key: string
+    - out put l
+        - list_of_frequencies: list/array
+- Generate wave function
+    - input: 
+        - frequnices: float
+    - output: 
+        - freqiesces: float
+
+Evelopes/Volume Class
+
+Filter Class
+
+
+**Generate Preset classes: (Reqirements 1, 2)**
+Take Audio data and calcuate them for presets
 
 Methods
 - Calcuate_Solfege
@@ -59,22 +81,6 @@ Methods
     - The computer keys are not assgined new numbers
     - The computer key are assigned number in a non- accending order. 
 
-Oscillater class (requirements 3, 4, 5)
-Method: 
-- Switch to preset 
-    - input 
-        - key: string
-    - out put l
-        - list_of_frequencies: list/array
-- Generate wave function
-    - input: 
-        - frequnices: float
-    - output: 
-        - freqiesces: float
-
-Evelopes/Volume Class
-
-Filter Class
 
 ## Others 
 Modules which can not be grouped, resolve requrment 
