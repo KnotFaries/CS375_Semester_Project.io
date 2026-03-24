@@ -26,7 +26,11 @@
 ## UI
 Modules which are about the UI and resolve requriments 
 
-Class Key Input
+Key_Input Class
+
+Number_Input Class
+
+Display Class
 
 ## Tutorial Pages (multpile classes)
 
