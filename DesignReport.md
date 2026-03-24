@@ -40,11 +40,13 @@ Moduels which are about the production of noise
 **Generate Audio Data classes: (Reqirements 1, 2)**
 Methods that generate the audio data
 
-Evelopes/Volume/ Class
+**Evelopes/Volume/ Class**
+
 Attributes:
 - Fundemtnal: Float
 - Aptidue: Float 
-Methods: 
+
+**Methods:** 
 - Generate Attack 
     - input
         -  Fundemtnal: Float
@@ -70,7 +72,7 @@ Methods:
     - output 
         - Aduio_Data: List
 
-Overtones Class: 
+**Overtones Class:**
 
 Atributes: 
 - Fundmental: Float 
@@ -126,11 +128,11 @@ Methods
         - frequency_list: list/array
 - Preconditons: 
     - home_tone NOT NULL
-    - Caclulate_Solfege outputs 8 unique frequiencies
+    - Caclulate_Solfege outputs 8 or more unique frequiencies
 - Postconitons (success)
-    - Calculate_Solfege out puts a number of frequeineces that is not 8
+    - Calculate_Solfege out puts a number of frequeineces that is less than 8
 - Postcondtions(fail)
-    - Calculate_Solfege ouptputs a number of frequencies that is not 8 
+    - Calculate_Solfege ouptputs a number of frequencies that is less 8 
    
 
 ## UI and Generation Connections
