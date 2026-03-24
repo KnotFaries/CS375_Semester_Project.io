@@ -124,22 +124,32 @@ Methods
         - mode: String (defult = major)
     - Output 
         - frequency_list: list/array
+- Preconditons: 
+    - home_tone NOT NULL
+    - Caclulate_Solfege outputs 8 unique frequiencies
+- Postconitons (success)
+    - Calculate_Solfege out puts a number of frequeineces that is not 8
+- Postcondtions(fail)
+    - Calculate_Solfege ouptputs a number of frequencies that is not 8 
+   
+
+## UI and Generation Connections
+
+
+
 - Assign to Computer_keyboards 
     - input 
         - frequency_list: list/array
     - output 
         - void
-- Preconditons: 
-    - home_tone NOT NULL
-    - Caclulate_Solfege outputs 8 unique frequiencies
-    - The keyboard has been assigned to diffrent notes. 
-- Postconitons (success)
-    - Calculate_Solfege out puts a number of frequeineces that is not 8
-    - The computer keys are assigned new numbers and accending order 
-- Postcondtions(fail)
-    - Calculate_Solfege ouptputs a number of frequencies that is not 8 
-    - The computer keys are not assgined new numbers
-    - The computer key are assigned number in a non- accending order. 
+    - Preconditons: 
+        - frequency_list: NOT NULL
+    - Post condtions (success)
+        - The computer keys are assigned new numbers in accending order and by designated pattern
+    - Post condtions (fail)
+        - The computer keys are not assgined new numbers
+        - The computer key are assigned number in a non- accending order. 
+
 
 
 ## Others 
