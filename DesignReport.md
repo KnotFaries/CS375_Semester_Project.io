@@ -37,20 +37,34 @@ Moduels which are about the production of noise
 Methods that generate the audio data
 
 Evelopes/Volume/ Class
-
+Attributes:
+- Fundemtnal: Float
+- Aptidue: Float 
 Methods: 
 - Generate Attack 
     - input
+        -  Fundemtnal: Float
+        - Aptidue: Float 
     - output 
+        - Aduio_Data: List
 - Generate Decay 
     - input
+        -  Fundemtnal: Float
+        - Aptidue: Float 
     - output 
+        - Aduio_Data: List
 - Generate sustain
     - input
+        -  Fundemtnal: Float
+        - Aptidue: Float 
     - output 
+        - Aduio_Data: List
 - Generate Relase
     - input
+        -  Fundemtnal: Float
+        - Aptidue: Float 
     - output 
+        - Aduio_Data: List
 
 Overtones Class: 
 
@@ -59,12 +73,20 @@ Atributes:
 
 Methods: 
 - generate_harmonics
+    - Input: 
+        - Fundemtal: Float
+    - Output:
+        - Harmonics: List 
 - generate_overtones
+    - Input: 
+        - Fundemtal: Float
+    - Output:
+        - ovetones: List 
 - fetch_overtones
     - Input: 
         - Instrument: String
     - Output
-        - 
+        - Overtones
 
 
 Take a funtmetal, calculate the harmonics, caluate the overtones, lower notes: more harmonics(tighter space?), Higher notes: Less harmonics 
