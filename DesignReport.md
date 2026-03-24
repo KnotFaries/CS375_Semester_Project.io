@@ -1,4 +1,8 @@
-# Assignmet
+# TO DO: 
+- UML 
+- UI Methods
+- Pre and Post condtions 
+- Class Diagram 
 ## Requirments:
 1) Able to export audio via mp3 file. 
 2) play audio through laptop's sound system. 
@@ -71,6 +75,9 @@ Attributes:
         - Aptidue: Float 
     - output 
         - Aduio_Data: List
+- Preconditons: 
+- Postcondtions (Success):
+- Postconditons (fail):
 
 **Overtones Class:**
 
@@ -93,7 +100,9 @@ Methods:
         - Instrument: String
     - Output
         - Overtones
-
+- Preconditons: 
+- Postcondtions (Success):
+- Postconditons (fail): 
 
 Take a funtmetal, calculate the harmonics, caluate the overtones, lower notes: more harmonics(tighter space?), Higher notes: Less harmonics 
 
@@ -155,4 +164,8 @@ Methods
 
 
 ## Others 
-Modules which can not be grouped, resolve requrment 
+- Record: 
+    - input: 
+        - audio_data?
+    - output
+        - wav file? 
