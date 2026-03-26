@@ -14,7 +14,6 @@
 8) Utlize preset of major pentatoinic
 9) Utilizes filters, LFOs and envelopes for timbral construction
 10) The user interface should allow users to control parameters through intuitive sliders and knobs.
-15) The application should support standard laptop audio hardware and drivers.
 
 # Classes and Methods 
 
@@ -33,7 +32,6 @@ Display Class
 Moduels which are about the production of noise
 
 **Generate Audio Data classes: (Reqirements 1, 2)**
-Methods that generate the audio data
 
 **Evelopes/Volume/ Class**
 
@@ -48,18 +46,30 @@ Attributes:
         - Aptidue: Float 
     - output 
         - Aduio_Data: List
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
+
 - Generate Decay 
     - input
         -  Fundemtnal: Float
         - Aptidue: Float 
     - output 
         - Aduio_Data: List
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
+
 - Generate sustain
     - input
         -  Fundemtnal: Float
         - Aptidue: Float 
     - output 
         - Aduio_Data: List
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
+
 - Generate Relase
     - input
         -  Fundemtnal: Float
@@ -80,20 +90,28 @@ Methods:
     - Input: 
         - Fundemtal: Float
     - Output:
-        - Harmonics: List 
+        - Harmonics: List
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
+
 - generate_overtones
     - Input: 
         - Fundemtal: Float
     - Output:
         - ovetones: List 
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
+    
 - fetch_overtones
     - Input: 
         - Instrument: String
     - Output
         - Overtones
-- Preconditons: 
-- Postcondtions (Success):
-- Postconditons (fail): 
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
 
 Filter Class
 
