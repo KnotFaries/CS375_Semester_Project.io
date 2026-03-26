@@ -153,7 +153,17 @@ Attributes:
         - Some notes may continue playing (undesired state)
 
 
-**Number_Input Class (Requirement 10)**
+
+**Number_Input Class**
+**(Requirement 10)**
+
+- Attributes
+    - current_input
+    - value
+    - is_active
+ 
+**Methods:**
+
 - Start Input
     - input:
         - none
