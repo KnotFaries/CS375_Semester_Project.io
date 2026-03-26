@@ -45,37 +45,37 @@ Attributes:
         - No invalid or partial mapping is stored
 
 - On Press (key)
-      - input:
-          - key
-      - output:
-          - none
-      - Preconditons: 
-          - `key` exists in `key_map`
-          - The audio generation system is initialized
-          - `key` is not already marked as active
-      - Postcondtions (success):
-          - `key` is added to `active_keys`
-          - The frequency assigned to `key` is sent to the envelope / overtone generation modules
-          - Audio playback for that note begins
-      - Postcondtions (fail): 
-          - `active_keys` is unchanged
-          - No note is started for an unmapped or invalid key
+    - input:
+        - key
+    - output:
+        - none
+    - Preconditons: 
+        - `key` exists in `key_map`
+        - The audio generation system is initialized
+        - `key` is not already marked as active
+    - Postcondtions (success):
+        - `key` is added to `active_keys`
+        - The frequency assigned to `key` is sent to the envelope / overtone generation modules
+        - Audio playback for that note begins
+    - Postcondtions (fail): 
+        - `active_keys` is unchanged
+        - No note is started for an unmapped or invalid key
 
 - On Release (key)
-      - input:
-          - 'key'
-      - output:
-          - none
-      - Preconditons: 
-          - `key` is currently in `active_keys`
-          - A note is currently being played for that key
-      - Postcondtions (success):
-          - `key` is removed from `active_keys`
-          - The release envelope is applied to the note
-          - Audio for that key stops after the release phase completes
-      - Postcondtions (fail): 
-          - `active_keys` is unchanged
-          - No playing note is modified when the key was not active
+    - input:
+        - 'key'
+    - output:
+        - none
+    - Preconditons: 
+        - `key` is currently in `active_keys`
+        - A note is currently being played for that key
+    - Postcondtions (success):
+        - `key` is removed from `active_keys`
+        - The release envelope is applied to the note
+        - Audio for that key stops after the release phase completes
+    - Postcondtions (fail): 
+        - `active_keys` is unchanged
+        - No playing note is modified when the key was not active
 
 - Start Listener
     - input:
