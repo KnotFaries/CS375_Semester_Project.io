@@ -153,7 +153,136 @@ Attributes:
         - Some notes may continue playing (undesired state)
 
 
-**Number_Input Class (Requriemtn 10)**
+**Number_Input Class (Requirement 10)**
+- Start Input
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - The system is ready to accept numeric input
+        - No conflicting input mode is active
+    - Postconditions (success):
+        - is_active is set to True
+        - current_input is initialized or cleared
+        - System begins capturing numeric input
+    - Postconditions (fail):
+        - is_active remains False
+        - No input is captured
+
+- Stop Input
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - Numeric input mode is currently active
+    - Postconditions (success):
+        - is_active is set to False
+        - Input buffer is preserved or finalized
+    - Postconditions (fail):
+        - is_active remains True
+        - Input mode continues unintentionally
+
+- Add Digit (digit)
+    - input:
+        - digit (string or character, e.g., '0'–'9', '.', '-')
+    - output:
+        - none
+    - Preconditions:
+        - is_active is True
+        - digit is a valid numeric character
+        - Input buffer has not exceeded maximum allowed length (if defined)
+    - Postconditions (success):
+        - digit is appended to current_input
+        - current_input remains a valid numeric string format
+    - Postconditions (fail):
+        - current_input is unchanged
+        - Invalid characters are ignored
+
+- Remove Last
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - is_active is True
+        - current_input is not empty
+    - Postconditions (success):
+        - Last character is removed from current_input
+        - Postconditions (fail):
+        - current_input remains unchanged if empty
+
+- Clear
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - none
+    - Postconditions (success):
+        - current_input is reset to an empty string
+        - value is reset to None (or default state)
+    - Postconditions (fail):
+        - Previous input may persist (undesired state)
+
+- Parse Value
+    - input:
+        - none
+    - output:
+        - Parsed number (float or int) OR None
+    - Preconditions:
+        - current_input is not empty
+        - current_input is in a valid numeric format
+    - Postconditions (success):
+        - value is updated with parsed numeric value
+        - Returned value matches parsed result
+    - Postconditions (fail):
+        - value remains unchanged or set to None
+        - Invalid format is safely handled (no crash)
+
+- Set Value (value)
+    - input:
+        - value (float or int)
+    - output:
+        - none
+    - Preconditions:
+        - value is a valid numeric type
+        - value is within acceptable range (e.g., valid frequency range if applicable)
+    - Postconditions (success):
+        - value is stored internally
+        - current_input may be updated to reflect this value
+    - Postconditions (fail):
+        - Internal value remains unchanged
+        - Invalid values are rejected
+
+- Get Value
+    - input:
+        - none
+    - output:
+        - Current numeric value OR None
+    - Preconditions:
+        - None
+    - Postconditions (success):
+        - Returns the current value stored in value
+        - Postconditions (fail):
+        - Returns None if no valid value exists
+        - No internal state is modified
+
+- Is Valid
+    - input:
+        - none
+    - output:
+        - Boolean (True / False)
+    - Preconditions:
+        - value is not None
+    - Postconditions (success):
+        - Returns True if value is within allowed constraints (e.g., 20Hz–20kHz)
+        - Returns False otherwise
+    - Postconditions (fail):
+        - Returns False if value is None or invalid
+        - No internal state is modified
+
 
 ## Sound Production 
 Moduels which are about the production of noise
