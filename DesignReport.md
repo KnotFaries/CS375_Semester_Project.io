@@ -20,20 +20,16 @@
 ## UI
 Modules which are about the UI and resolve requriments 
 
-Key_Input Class
+**Key_Input Class(Requriment 11)**
 
-Number_Input Class
-
-Display Class
-
-## Tutorial Pages (multpile classes)
+**Number_Input Class (Requriemtn 10)**
 
 ## Sound Production 
 Moduels which are about the production of noise
 
-**Generate Audio Data classes: (Reqirements 1, 2)**
+**Generate Audio Data classes:**
 
-**Evelopes/Volume/ Class**
+**Evelopes/Volume/ Class (Requriemnts 4, 9)**
 
 Attributes:
 - Fundemtnal: Float
@@ -80,7 +76,7 @@ Attributes:
 - Postcondtions (Success):
 - Postconditons (fail):
 
-**Overtones Class:**
+**Overtones Class:(Requriemnts 4, 9)**
 
 Atributes: 
 - Fundmental: Float 
@@ -116,8 +112,7 @@ Methods:
 Filter Class
 
 
-**Generate Preset classes: (Reqirements 1, 2)**
-Take Audio data and calcuate them for presets
+**Generate_Preset classes: (Reqirements 3, 6, 7, 8)**
 
 Methods
 - Calcuate_Scale
@@ -137,8 +132,8 @@ Methods
 
 ## UI and Generation Connections
 
-
-
+**Other or Unassigned (Requrments 1, 3,6,7,8,9,10,11)**
+**Methods:**
 - Assign to Computer_keyboards 
     - input 
         - frequency_list: list/array
@@ -152,15 +147,14 @@ Methods
         - The computer keys are not assgined new numbers
         - The computer key are assigned number in a non- accending order. 
 
-
-
-## Others 
 - Record: 
     - input: 
         - audio_data?
     - output
         - wav file? 
-
+    - Preconditons: 
+    - Postcondtions (Success):
+    - Postconditons (fail): 
 # Relationship Diagram
 
 (![Class Relation chart](ClassRelationship.jpg))
