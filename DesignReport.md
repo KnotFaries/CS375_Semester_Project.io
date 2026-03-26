@@ -21,6 +21,38 @@
 Modules which are about the UI and resolve requriments 
 
 **Key_Input Class(Requriment 11)**
+Attributes: 
+- key_map
+- active_keys
+
+**Methods:**
+- Setup for Key Map
+    - input:
+          - Scale: string
+          - Base Frequency: float
+    - output:
+          - none
+    - Preconditons: 
+    - Postcondtions (success):
+    - Postconditons (fail): 
+
+- On Press (key)
+      - input:
+          - key
+      - output:
+          - none
+      - Preconditons: 
+      - Postcondtions (success):
+      - Postconditons (fail): 
+
+- On Release (key)
+      - input:
+          - key
+      - output:
+          - none
+      - Preconditons: 
+      - Postcondtions (success):
+      - Postconditons (fail): 
 
 **Number_Input Class (Requriemtn 10)**
 
