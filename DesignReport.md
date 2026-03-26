@@ -3,7 +3,7 @@
 - UI Methods
 - Pre and Post condtions 
 - Class Diagram 
-## Requirments:
+# Requirments:
 1) Able to export audio via mp3 file. 
 2) play audio through laptop's sound system. 
 3) Produce 12 notes of a western chromatic scale in equal temperament
@@ -14,18 +14,9 @@
 8) Utlize preset of major pentatoinic
 9) Utilizes filters, LFOs and envelopes for timbral construction
 10) The user interface should allow users to control parameters through intuitive sliders and knobs.
-11) Export audio player can be accessed through a standard english keyboard 
-12) These features must be optomized for an intel core i5/ ryzen 5 or higher\
-13) Users should be able to learn basic functionality within 5 minutes without documentation.
-14) The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
 15) The application should support standard laptop audio hardware and drivers.
-16) The desktop application should run on Windows 10 or later
-8) The synthesizer should not exceed: 20% CPU usage during normal operation
-9) The synthesizer should not exceed 500 MB of RAM
-10) The architecture should allow future support for Additional oscillators
-11) The architecture should allow future support for More musical scales
-12) The architecture should allow future support for MIDI input
-13) The architecture should allow future support for Additional filter types
+
+# Classes and Methods 
 
 ## UI
 Modules which are about the UI and resolve requriments 
@@ -104,24 +95,6 @@ Methods:
 - Postcondtions (Success):
 - Postconditons (fail): 
 
-Take a funtmetal, calculate the harmonics, caluate the overtones, lower notes: more harmonics(tighter space?), Higher notes: Less harmonics 
-
-
-Oscillater class (requirements 3, 4, 5)
-Method: 
-- Switch to preset 
-    - input 
-        - key: string
-    - out put l
-        - list_of_frequencies: list/array
-- Generate wave function
-    - input: 
-        - frequnices: float
-    - output: 
-        - freqiesces: float
-
-
-
 Filter Class
 
 
@@ -129,7 +102,7 @@ Filter Class
 Take Audio data and calcuate them for presets
 
 Methods
-- Calcuate_Solfege
+- Calcuate_Scale
     - Inputs 
         - home_tone: float
         - mode: String (defult = major)
@@ -137,11 +110,11 @@ Methods
         - frequency_list: list/array
 - Preconditons: 
     - home_tone NOT NULL
-    - Caclulate_Solfege outputs 8 or more unique frequiencies
 - Postconitons (success)
-    - Calculate_Solfege out puts a number of frequeineces that is less than 8
+    - Outputs a list of frequenices in line withe the modal scale
 - Postcondtions(fail)
-    - Calculate_Solfege ouptputs a number of frequencies that is less 8 
+    - Outputls a list of frequenices not in line with the modal scale
+    - dose not output a list
    
 
 ## UI and Generation Connections
@@ -169,3 +142,7 @@ Methods
         - audio_data?
     - output
         - wav file? 
+
+# Relationship Diagram
+
+(![Class Relation chart](ClassRelationship.jpg))
