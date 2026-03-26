@@ -63,7 +63,7 @@ Attributes:
 
 - On Release (key)
       - input:
-          - key
+          - 'key'
       - output:
           - none
       - Preconditons: 
@@ -76,6 +76,82 @@ Attributes:
       - Postcondtions (fail): 
           - `active_keys` is unchanged
           - No playing note is modified when the key was not active
+
+- Start Listener
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - The keyboard listener is not already running
+        - Event handlers (on_press, on_release) are defined
+        - 'pynput' is properly installed and accessible
+    - Postconditions (success):
+        - Keyboard listener is started
+        - System begins capturing key press and release events asynchronously
+    - Postconditions (fail):
+        - Listener remains inactive
+        - No input events are captured
+
+
+- Stop Listener
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - Keyboard listener is currently running
+    - Postconditions (success):
+        - Keyboard listener is stopped
+        - No further key events are processed
+    - Postconditions (fail):
+        - Listener state remains unchanged
+        - System may continue capturing input
+
+- Get Active Notes
+    - input:
+        - none
+    - output:
+        - List of frequencies (List<float>)
+    - Preconditions:
+        - 'key_map' has been initialized
+    - Postconditions (success):
+        - Returns a list of frequencies corresponding to keys in active_keys
+        - Returned list accurately reflects current pressed keys
+    - Postconditions (fail):
+        - Returns an empty list if no keys are active
+        - No internal state is modified
+
+
+- Is Key Active (key)
+    - input:
+        - 'key'
+    - output:
+        - Boolean (True / False)
+    - Preconditions:
+        - 'key' is a valid keyboard key object or identifier
+    - Postconditions (success):
+        - Returns True if 'key' is in 'active_keys'
+        - Returns False otherwise
+    - Postconditions (fail):
+        - Returns False if 'key' is invalid or not tracked
+        - No internal state is modified
+
+- Clear Active Keys
+    - input:
+        - none
+    - output:
+        - none
+    - Preconditions:
+        - None (can be called at any time)
+    - Postconditions (success):
+        - 'active_keys' is emptied
+        - All currently playing notes are stopped immediately (panic/reset behavior)
+        - Any active envelopes are terminated or forced into release
+    - Postconditions (fail):
+        - If clearing fails, 'active_keys' may remain partially unchanged
+        - Some notes may continue playing (undesired state)
+
 
 **Number_Input Class (Requriemtn 10)**
 
