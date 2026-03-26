@@ -33,8 +33,16 @@ Attributes:
     - output:
           - none
     - Preconditons: 
+        - Scale is not NULL and matches a supported preset or scale type
+        - Base Frequency is a positive float
+        - The keyboard layout to be mapped has been defined
     - Postcondtions (success):
-    - Postconditons (fail): 
+        - `key_map` contains a valid mapping from keyboard keys to frequencies in the selected scale
+        - The mapped frequencies are calculated relative to the Base Frequency
+        - `active_keys` is empty before new input begins
+    - Postcondtions (fail): 
+        - `key_map` remains empty or unchanged
+        - No invalid or partial mapping is stored
 
 - On Press (key)
       - input:
@@ -42,8 +50,16 @@ Attributes:
       - output:
           - none
       - Preconditons: 
+          - `key` exists in `key_map`
+          - The audio generation system is initialized
+          - `key` is not already marked as active
       - Postcondtions (success):
-      - Postconditons (fail): 
+          - `key` is added to `active_keys`
+          - The frequency assigned to `key` is sent to the envelope / overtone generation modules
+          - Audio playback for that note begins
+      - Postcondtions (fail): 
+          - `active_keys` is unchanged
+          - No note is started for an unmapped or invalid key
 
 - On Release (key)
       - input:
@@ -51,8 +67,15 @@ Attributes:
       - output:
           - none
       - Preconditons: 
+          - `key` is currently in `active_keys`
+          - A note is currently being played for that key
       - Postcondtions (success):
-      - Postconditons (fail): 
+          - `key` is removed from `active_keys`
+          - The release envelope is applied to the note
+          - Audio for that key stops after the release phase completes
+      - Postcondtions (fail): 
+          - `active_keys` is unchanged
+          - No playing note is modified when the key was not active
 
 **Number_Input Class (Requriemtn 10)**
 
@@ -75,8 +98,16 @@ Attributes:
     - output 
         - Aduio_Data: List
     - Preconditons: 
+        - Fundemtnal is a positive float
+        - Aptidue is a non-negative float within the supported output range
+        - Attack duration and sample rate have been defined
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - `Aduio_Data` is returned as a non-empty list of samples
+        - The waveform amplitude rises from 0 toward the target Aptidue
+        - The waveform is generated at the given Fundemtnal
+    - Postcondtions (fail): 
+        - No valid sample list is produced
+        - The generated data does not represent an increasing attack phase
 
 - Generate Decay 
     - input
@@ -85,8 +116,16 @@ Attributes:
     - output 
         - Aduio_Data: List
     - Preconditons: 
+        - Fundemtnal is a positive float
+        - Aptidue is a non-negative float within the supported output range
+        - Decay duration and sustain target have been defined
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - `Aduio_Data` is returned as a non-empty list of samples
+        - The waveform amplitude decreases from the attack peak toward the sustain level
+        - The waveform remains based on the given Fundemtnal
+    - Postcondtions (fail): 
+        - No valid sample list is produced
+        - The generated data does not represent a decreasing decay phase
 
 - Generate sustain
     - input
@@ -95,8 +134,16 @@ Attributes:
     - output 
         - Aduio_Data: List
     - Preconditons: 
+        - Fundemtnal is a positive float
+        - Aptidue is a non-negative float within the supported output range
+        - Sustain duration has been defined
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - `Aduio_Data` is returned as a non-empty list of samples
+        - The waveform maintains a stable amplitude near the sustain level
+        - The waveform remains based on the given Fundemtnal
+    - Postcondtions (fail): 
+        - No valid sample list is produced
+        - The generated data does not hold a stable sustain phase
 
 - Generate Relase
     - input
@@ -104,9 +151,17 @@ Attributes:
         - Aptidue: Float 
     - output 
         - Aduio_Data: List
-- Preconditons: 
-- Postcondtions (Success):
-- Postconditons (fail):
+    - Preconditons: 
+        - Fundemtnal is a positive float
+        - Aptidue is a non-negative float within the supported output range
+        - Release duration has been defined
+    - Postcondtions (Success):
+        - `Aduio_Data` is returned as a non-empty list of samples
+        - The waveform amplitude decreases smoothly to 0
+        - The note is ready to stop without an abrupt cutoff
+    - Postcondtions (fail):
+        - No valid sample list is produced
+        - The generated data does not fade to 0 at the end of the release
 
 **Overtones Class:(Requriemnts 4, 9)**
 
@@ -120,8 +175,15 @@ Methods:
     - Output:
         - Harmonics: List
     - Preconditons: 
+        - Fundemtal is a positive float
+        - The number of harmonic partials to generate has been defined
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - `Harmonics` is returned as a non-empty list
+        - Each harmonic frequency is an integer multiple of the Fundemtal
+        - The harmonic list is ordered from lower to higher frequency
+    - Postcondtions (fail): 
+        - No valid harmonic list is returned
+        - Returned frequencies are not consistent multiples of the Fundemtal
 
 - generate_overtones
     - Input: 
@@ -129,8 +191,15 @@ Methods:
     - Output:
         - ovetones: List 
     - Preconditons: 
+        - Fundemtal is a positive float
+        - A harmonic / timbre profile is available for overtone generation
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - `ovetones` is returned as a non-empty list
+        - The list contains overtone frequencies derived from the Fundemtal
+        - The overtone data can be passed to the oscillator mix or envelope stage
+    - Postcondtions (fail): 
+        - No valid overtone list is returned
+        - Returned frequencies are not consistent with the Fundemtal or selected profile
     
 - fetch_overtones
     - Input: 
@@ -138,8 +207,14 @@ Methods:
     - Output
         - Overtones
     - Preconditons: 
+        - Instrument is not NULL
+        - Instrument matches a supported preset or stored overtone profile
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - A valid overtone profile is returned for the requested Instrument
+        - The returned profile can be used by `generate_overtones`
+    - Postcondtions (fail): 
+        - No overtone profile is returned, or a default / empty profile is returned
+        - No unsupported Instrument profile is stored as valid
 
 Filter Class
 
@@ -155,8 +230,12 @@ Methods
         - frequency_list: list/array
 - Preconditons: 
     - home_tone NOT NULL
+    - home_tone is a positive float
+    - mode is one of the supported values (major, minor, pentatonic, chromatic)
 - Postconitons (success)
     - Outputs a list of frequenices in line withe the modal scale
+    - The frequencies are ordered from lowest to highest
+    - The list is calculated from `home_tone` using equal temperament intervals
 - Postcondtions(fail)
     - Outputls a list of frequenices not in line with the modal scale
     - dose not output a list
@@ -173,8 +252,11 @@ Methods
         - void
     - Preconditons: 
         - frequency_list: NOT NULL
+        - `frequency_list` contains positive frequency values
+        - Enough keyboard keys are available for the assignment pattern
     - Post condtions (success)
         - The computer keys are assigned new numbers in accending order and by designated pattern
+        - Each assigned key maps to exactly one frequency in `frequency_list`
     - Post condtions (fail)
         - The computer keys are not assgined new numbers
         - The computer key are assigned number in a non- accending order. 
@@ -185,8 +267,15 @@ Methods
     - output
         - wav file? 
     - Preconditons: 
+        - `audio_data` is not NULL
+        - `audio_data` contains valid audio samples
+        - A file name or export path has been provided
     - Postcondtions (Success):
-    - Postconditons (fail): 
+        - A valid audio file is written to disk from `audio_data`
+        - The saved file can be opened and played back
+    - Postcondtions (fail): 
+        - No file is created, or the file is incomplete / unreadable
+        - The original `audio_data` remains unchanged
 # Relationship Diagram
 
 (![Class Relation chart](ClassRelationship.jpg))
