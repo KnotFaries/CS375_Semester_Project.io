@@ -1,4 +1,3 @@
-
 # Requirments:
 1) Able to export audio via mp3 file. 
 2) play audio through laptop's sound system. 
