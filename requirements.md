@@ -1,13 +1,13 @@
 # Requirements: 
 ## Press Relase: 
-Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increese in the autmotization of music as we strive to not repoduce music, but replicate it. Our goal is to create a tool which encourages free, strange, uniqe and unabashedly human music. 
+Comming from a liberal arts education, we have decided that world is shaped by the art we create, and our art is shaped by our material conditons. Since the 19th century, there has been an increase in the autmotization of music as we strive to not reproduce music, but replicate it. Our goal is to create a tool which encourages free, strange, unique and unabashedly human music. 
 
 What we will create is a free synthesizer, that can run on low end computers such as student laptops (AMD Ryzen 5/ Intel I5 cpu and about 8 gigs of ram.) Aspiring artist will have access to all the notes of a standard piano, as well as the free pitch sounds of oscilators.
 
 ## Interviews: 
 [ Inital Interview with Ash Hawkes](https://drive.google.com/file/d/12T3JomlqMWkhvdudFzyKspx-jlWIuCh7/view?usp=sharing)
 
-Ash is is musical, but not formaly trained. They are looking for a intuitive interface that aligns with how they conceptualize music (As waves and textures) and work with costmoizeable sets of pitches and flowing glisandos. 
+Ash is musical, but not formaly trained. They are looking for a intuitive interface that aligns with how they conceptualize music (As waves and textures) and work with customizable sets of pitches and flowing glisandos. 
 
 ## User Stories: 
 1. As a musican I want to use the equipment I already own. 
@@ -28,10 +28,10 @@ Ash is is musical, but not formaly trained. They are looking for a intuitive int
 - US 5: Utilizes filters, LFOs and envelopes for timbral construction
 - desktop application 
 
-## Nonfunctional Requirments
+## Nonfunctional Requirements
 - US 6 The user interface should allow users to control parameters through intuitive sliders and knobs.
 - Export audio player can be accessed through a standard english keyboard 
-- US 1 4 5: These features must be optomized for an intel core i5/ ryzen 5 or higher\
+- US 1 4 5: These features must be optimized for an intel core i5/ ryzen 5 or higher
 - US 6 Users should be able to learn basic functionality within 5 minutes without documentation.
 - US 1 The system should generate and play synthesized audio with latency below 50 ms between user interaction (knob/slider change) and audible output. 
 - US 1 The application should support standard laptop audio hardware and drivers.
