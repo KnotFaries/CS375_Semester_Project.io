@@ -1,8 +1,4 @@
-# TO DO: 
-- UML 
-- UI Methods
-- Pre and Post condtions 
-- Class Diagram 
+
 # Requirments:
 1) Able to export audio via mp3 file. 
 2) play audio through laptop's sound system. 
@@ -295,11 +291,13 @@ Attributes:
 
 
 ## Sound Production 
-Moduels which are about the production of noise
+Moduels which are about the production of noise. 
 
 **Generate Audio Data classes:**
 
 **Evelopes/Volume/ Class (Requriemnts 4, 9)**
+
+![Enevlope class UML](Images/UML_Envelope.png)
 
 Attributes:
 - Fundemtnal: Float
@@ -380,6 +378,8 @@ Attributes:
 
 **Overtones Class:(Requriemnts 4, 9)**
 
+![Overtone Class UML](<Images/UML Overtones.png>)
+
 Atributes: 
 - Fundmental: Float 
 
@@ -431,10 +431,10 @@ Methods:
         - No overtone profile is returned, or a default / empty profile is returned
         - No unsupported Instrument profile is stored as valid
 
-Filter Class
-
 
 **Generate_Preset classes: (Reqirements 3, 6, 7, 8)**
+
+![Generate Preset Class](<Images/UML Generate Presets.png>)
 
 Methods
 - Calcuate_Scale
@@ -456,9 +456,7 @@ Methods
     - dose not output a list
    
 
-## UI and Generation Connections
-
-**Other or Unassigned (Requrments 1, 3,6,7,8,9,10,11)**
+## UI and Generation Connections Class (Requrments 1, 3,6,7,8,9,10,11)
 **Methods:**
 - Assign to Computer_keyboards 
     - input 
@@ -478,9 +476,9 @@ Methods
 
 - Record: 
     - input: 
-        - audio_data?
+        - audio_data: audio samples 
     - output
-        - wav file? 
+        - wav file
     - Preconditons: 
         - `audio_data` is not NULL
         - `audio_data` contains valid audio samples
@@ -494,3 +492,16 @@ Methods
 # Relationship Diagram
 
 (![Class Relation chart](ClassRelationship.jpg))
+
+
+# Notes 
+
+All uese of `num_input` are curently place holders for knobs or sliders. On the mathmatic side of sound, all inputs are a float between 0 and 1, so all sliders and knobs input some float. 
+
+Ocilateros, filters, LFOs and timbral construction are all the same thing. In musical terms, they all are about chaning the timber of a sound. Timber is how we can tell what produces a noise, how we know the diffrence between a piano, violin, or electric gituar. These were orginaly conceptulized as sperate requriments, due to them often being taught in isolation as older alalog sythiszers needed them to be seprate. But now in digital sythisizers they are all done through the same process, but often still kept seprate in order to fall in line with musical traditon. 
+
+The use of presets also covers muliple requriments, as they were all secretely the same process. Requriment 3 "Produce 12 notes of a western chromatic scale in equal temperament" is about creating a list of 12 frequeinces, each spaced equaly apart where the lowest and highest notes are in a 2:1 ratio. This produces the scale you get by hitting all the keys on a piano. Major, minor, and pentatonic scales are just selection of these 12 notes. 
+
+There are two methods we use for these. The fetch version of the method would assign the stadard musical 12 notes used by nearly every western instrument, while calculate could take any number as the home tone (the lowest and highest note in the scale) to be any number, irregradelss if it's weird or not recomended. 
+
+Most of our non-functional requriemtns have not been directly labled, as they have to do with technical preformance, and so will show up durring the implemnation phase. 
