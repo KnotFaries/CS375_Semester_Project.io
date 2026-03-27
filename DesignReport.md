@@ -1,13 +1,22 @@
 # Requirments:
-1) Able to export audio via mp3 file. 
+1) Able to export audio via mp3 file.
+
 2) play audio through laptop's sound system. 
+
 3) Produce 12 notes of a western chromatic scale in equal temperament
+
 4) Utilizes 2 or 3 oscillators to synthesize multiple frequencies
+
 5) Can amplify the frequencies and convert them to sound
+
 6) Untilize presets major scale in any key
+
 7) Utalize preset of minor scales in any key
+
 8) Utlize preset of major pentatoinic
+
 9) Utilizes filters, LFOs and envelopes for timbral construction
+
 10) The user interface should allow users to control parameters through intuitive sliders and knobs.
 
 # Classes and Methods 
@@ -490,7 +499,7 @@ Methods
         - The original `audio_data` remains unchanged
 # Relationship Diagram
 
-(![Class Relation chart](ClassRelationship.jpg))
+![Class Relation chart](Images/ClassRelationship.jpg)
 
 
 # Notes 
