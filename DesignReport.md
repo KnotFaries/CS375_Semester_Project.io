@@ -501,7 +501,8 @@ Methods
 
 ![Class Relation chart](Images/ClassRelationship.jpg)
 
-
+# Database
+No database currently needed. Maybe in the future. 
 # Notes 
 
 All uese of `num_input` are curently place holders for knobs or sliders. On the mathmatic side of sound, all inputs are a float between 0 and 1, so all sliders and knobs input some float. 
