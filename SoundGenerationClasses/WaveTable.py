@@ -8,6 +8,73 @@ import sounddevice as sd
 import numpy as np
 import scipy.io.wavfile as wav
 
+
+def attack (signal, fade_length = 1000):
+    """
+
+    Parameters
+    ----------
+    signal : Array
+        DESCRIPTION.
+    fade_length : int, optional
+        DESCRIPTION. The default is 1000.Number of samples that the attack takes place over
+
+    Returns
+    -------
+    signal : Array
+        DESCRIPTION.
+
+    """
+    fade_in = (1- np.cos(np.linspace(0, np.pi, fade_length))) *0.5
+    signal[:fade_length] = np.multiply(fade_in, signal[:fade_length])
+    return signal
+    
+def release (signal, fade_length = 1000):
+    """
+
+    Parameters
+    ----------
+    signal : Array
+        DESCRIPTION.
+    fade_length : int, optional
+        DESCRIPTION. The default is 1000.Number of samples that the attack takes place over
+
+    Returns
+    -------
+    signal : Array
+        DESCRIPTION.
+
+    """
+    fade_in = (1- np.cos(np.linspace(0, np.pi, fade_length))) *0.5
+    fade_out = np.flip(fade_in)
+    signal[-fade_length:] = np.multiply(fade_out, signal[-fade_length:])
+    
+
+def amp(output, gain = -20):
+    """
+    Parameters
+    ----------
+    output : Array
+        DESCRIPTION.
+    gain : TYPE, optional
+        DESCRIPTION. The default is -20.
+    Returns
+    -------
+    output : array
+        Output, but less loud
+
+    """
+    gain = -20
+    amp = 10 ** (gain/20)
+    output *= amp 
+    return output
+
+def create_envelope(signal, gain, attack_len, release_leng):
+    signal = amp(signal, gain)
+    signal = attack(signal, attack_len)
+    signal = attack(signal, release_leng)
+    return signal
+
 def interpolate_linearly(wavetable, index):
     """
     Helper function 
@@ -76,12 +143,15 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
         output[n]= interpolate_linearly(wavetable, index)
         index += index_increment
         index %= wavetable_length
+      
+    output = create_envelope(output, -10, 1000, 3000)
     
+      
     return output
     
 sample_rate = 44100
 frequency = 440
-durration = 6
+durration = 3
 waveform = np.sin
 
 a = generate_wavetable(frequency, durration, waveform)
