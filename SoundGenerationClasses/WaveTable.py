@@ -4,7 +4,7 @@ Created on Sun Apr  5 10:19:48 2026
 
 @author: maiam
 """
-
+import sounddevice as sd
 import numpy as np
 import scipy.io.wavfile as wav
 
@@ -77,8 +77,13 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
         index += index_increment
         index %= wavetable_length
     
+    return output
     
 sample_rate = 44100
-frequency = 220
-t = 3
+frequency = 440
+durration = 6
 waveform = np.sin
+
+a = generate_wavetable(frequency, durration, waveform)
+
+sd.play(a)
