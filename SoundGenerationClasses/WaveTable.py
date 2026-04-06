@@ -154,6 +154,24 @@ frequency = 440
 durration = 3
 waveform = np.sin
 
-a = generate_wavetable(frequency, durration, waveform)
+c = generate_wavetable(261.63, durration, waveform)
+d = generate_wavetable(293.66, durration, waveform)
+e = generate_wavetable(329.63, durration, waveform)
+f = generate_wavetable(349.23, durration, waveform)
+g = generate_wavetable(392.00, durration, waveform)
+a = generate_wavetable(440, durration, waveform)
+b = generate_wavetable(493.88, durration, waveform)
+c5 = generate_wavetable(523.24, durration, waveform)
 
-sd.play(a)
+
+
+sd.play(c)
+sd.wait()
+sd.play(e)
+sd.wait()
+sd.play(g)
+sd.wait()
+
+sd.play(c)
+sd.play(e)
+sd.play(g)
