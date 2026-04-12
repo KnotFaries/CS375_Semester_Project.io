@@ -6,6 +6,7 @@ Created on Sun Apr  5 10:19:48 2026
 """
 import sounddevice as sd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def attack (signal, fade_length = 1000):
@@ -151,10 +152,12 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
     
 sample_rate = 44100
 frequency = 440
-durration = 3
+durration = 1
 waveform = np.sin
 
 c = generate_wavetable(261.63, durration, waveform)
+plt.plot(c[-6000:])
+"""
 d = generate_wavetable(293.66, durration, waveform)
 e = generate_wavetable(329.63, durration, waveform)
 f = generate_wavetable(349.23, durration, waveform)
@@ -174,4 +177,4 @@ sd.wait()
 
 sd.play(c)
 sd.play(e)
-sd.play(g)
+sd.play(g)"""
