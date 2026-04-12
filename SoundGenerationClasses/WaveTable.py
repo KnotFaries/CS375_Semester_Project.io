@@ -6,7 +6,6 @@ Created on Sun Apr  5 10:19:48 2026
 """
 import sounddevice as sd
 import numpy as np
-import scipy.io.wavfile as wav
 
 
 def attack (signal, fade_length = 1000):
@@ -48,6 +47,7 @@ def release (signal, fade_length = 1000):
     fade_in = (1- np.cos(np.linspace(0, np.pi, fade_length))) *0.5
     fade_out = np.flip(fade_in)
     signal[-fade_length:] = np.multiply(fade_out, signal[-fade_length:])
+    return signal
     
 
 def amp(output, gain = -20):
@@ -72,7 +72,7 @@ def amp(output, gain = -20):
 def create_envelope(signal, gain, attack_len, release_leng):
     signal = amp(signal, gain)
     signal = attack(signal, attack_len)
-    signal = attack(signal, release_leng)
+    signal = release(signal, release_leng)
     return signal
 
 def interpolate_linearly(wavetable, index):
