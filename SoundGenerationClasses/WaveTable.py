@@ -52,7 +52,7 @@ def release (signal, fade_length = 1000):
     return signal
     
 
-def amp(output, gain = -20):
+def amp(output, i_gain = -20):
     """
     Parameters
     ----------
@@ -66,7 +66,7 @@ def amp(output, gain = -20):
         Output, but less loud
 
     """
-    gain = -20
+    gain = i_gain
     amp = 10 ** (gain/20)
     output *= amp 
     return output
@@ -150,3 +150,5 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
     
       
     return output
+
+a = generate_wavetable(440, 1, np.sin)
