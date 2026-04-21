@@ -68,6 +68,8 @@ def amp(output, i_gain = -20):
     """
     gain = i_gain
     amp = 10 ** (gain/20)
+    print (amp)
+    print (output)
     output *= amp 
     return output
 

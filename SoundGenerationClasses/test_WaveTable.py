@@ -23,14 +23,17 @@ def test_release():
     assert a[2] == b [2]
     
 def test_amp():
-    a =[4,4,4,4]
-    b = wt.amp([4,4,4,4], -2)
-    assert a[3] > b [3]
-    assert a[2] == b [2]
+    a =np.array([4.0,4.0,4.0,4.0])
+    b =np.array([4.0,4.0,4.0,4.0])
+    wt.amp(a, -20)
+    assert b[1] > a [1]
+    assert b[2] > a [2]
+    assert b[3] > a [3]
+    assert b[0] > a [0]
     
 def test_create_envelope():
-    a =[0,0,0,0]
-    wt.interpolate_linearly(a, 0)
+    a =np.array([10.0,10.0,10.0,10.0,10.0,10.0,10.0])
+    wt.create_envelope(a, -3, 3, 3)
 
     pass
 
@@ -53,6 +56,10 @@ def test_interpolate_linearly():
         index += 1
         index %= wavetable_length
     pass
+
+    assert output[1] != 0 
+    assert output[3] != 0 
+    assert output[2] != 0 
 
 def test_generate_wavetabel():
     pass 
