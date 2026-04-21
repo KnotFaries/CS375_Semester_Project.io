@@ -5,6 +5,7 @@ Created on Sun Apr 12 14:43:47 2026
 @author: maiam
 """
 import WaveTable as wt
+import numpy as np
 
 
 
@@ -28,9 +29,29 @@ def test_amp():
     assert a[2] == b [2]
     
 def test_create_envelope():
+    a =[0,0,0,0]
+    wt.interpolate_linearly(a, 0)
+
     pass
 
 def test_interpolate_linearly():
+        
+    output = np.zeros(4)
+    wavetable_length = 7
+    wavetable = np.zeros(7)
+    index =0
+    
+    waveform = np.sin
+    
+    for n in range(wavetable_length):
+        wavetable [n] = waveform( 2* np.pi * n / wavetable_length)
+    
+    
+    for n in range(output.shape[0]):
+        
+        output[n]= wt.interpolate_linearly(wavetable, index)
+        index += 1
+        index %= wavetable_length
     pass
 
 def test_generate_wavetabel():
