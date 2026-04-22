@@ -17,13 +17,18 @@ The following are the function in test_Wavetable.py followed by a descriptions.
 - test_generate_wavetabel():
     - Given frequency, durration, and waveform, the out put shoul have some values in all parts of an array
 ## Integration Test
+- 
 ## User Acceptance Testing
 The following test are to test for musical acurracy:
 ### C major Pitch testing 
-Using any tuning app, run through a c major scale and check if all notes are in tune. 
-## Change scalre to C minor
-
+Go to the drop down menues on the left. Select 'major' as the scale and 'c' as Do. Using any tuning app, run through a c major scale and check if all notes are in tune. 
 ### C minor Pitch testing 
-Using any tuning app, run through a c minor scale and check if all notes are in tune. 
-### Change scale to D major
+Go to the drop down menues on the left. Select 'minor' as the scale and 'c' as Do. Using any tuning app, run through a c major scale and check if all notes are in tune. Using any tuning app, run through a c minor scale and check if all notes are in tune. change scale to D major
+
 ### Test ability to play simple piece 
+Play the following in any major key: 
+
+Mi Mi Fa So So Fa Mi Re Do Do Re Mi Mi Re Re 
+Mi Mi Fa So So Fa Mi Re Do Do Re Mi Re Do Do
+
+- Ode to joy, Ludwig van Bethoven 
