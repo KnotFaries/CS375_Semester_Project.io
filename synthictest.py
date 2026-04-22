@@ -1,6 +1,7 @@
 import numpy as np
 import sounddevice as sd
 from pynput import keyboard
+import soundfile as sf
 
 SAMPLE_RATE = 44100
 
@@ -48,12 +49,13 @@ class Preset:
         return [base_freq * (2 ** (n/12)) for n in steps]
 
 class Synth:
-    def __init__(self):
+    def __init__(self, recorder=None):
         self.osc1 = Oscillator("sine")
         self.osc2 = Oscillator("saw")
         self.osc3 = Oscillator("square")
 
         self.env = Envelope()
+        self.recorder = recorder
 
     def play_note(self, freq, duration=1.0):
         s1 = self.osc1.generate(freq, duration, 0.4)
@@ -62,6 +64,9 @@ class Synth:
         signal = s1 + s2 + s3
 
         sd.play(signal, SAMPLE_RATE)
+
+        if self.recorder:
+            self.recorder.add(signal) 
 
         return signal
 
@@ -82,6 +87,12 @@ class KeyInput:
 
         try:
             k = key.char
+
+            if k == "r":
+                print("Recording save triggered")
+                self.synth.recorder.save("my_recording.wav")
+                return
+
             if k in self.key_map and k not in self.active_keys:
                 self.active_keys.add(k)
                 self.synth.play_note(self.key_map[k])
@@ -101,14 +112,39 @@ class KeyInput:
         ) as listener:
             listener.join()
 
+class Recorder:
+    def __init__(self):
+        self.buffer = []
+
+    def add(self, signal):
+        self.buffer.append(signal.copy())
+
+    def save(self, filename="output.wav"):
+        if not self.buffer:
+            print("Nothing recorded!")
+            return
+
+        audio = np.concatenate(self.buffer)
+        sf.write(filename, audio, SAMPLE_RATE)
+        print(f"Saved recording to {filename}")
+
+
 if __name__ == "__main__":
+    import os
+    print("Saving to:", os.getcwd())
+
     base_freq = 261.63  # C4
 
     preset = Preset()
     scale = preset.calculate_scale(base_freq, mode="minor")
 
-    synth = Synth()
+    recorder = Recorder()
+
+    synth = Synth(recorder=recorder)
     keys = KeyInput(synth, scale)
 
     print("Press keys (ASDF...) to play notes")
+    print("Press 'r' to save recording")
+    print("Press ESC to exit")
+    
     keys.start()
