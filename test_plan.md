@@ -1,5 +1,7 @@
 # Test Plan
 ## Unit Test
+## UI 
+## Recording
 ## Wave Table
 The following are the function in test_Wavetable.py followed by a descriptions. 
 - test_attack
@@ -51,4 +53,4 @@ Mi Mi Fa So So Fa Mi Re Do Do Re Mi Re Do Do
 
 
 ## Recording Test
-- Test the recording ability by playing any string of notes and hitting record, then check if there is an MP3 or Wav file.
+- Test add() play notes on synthesiser and use save() to check that the recording is picking up sound
