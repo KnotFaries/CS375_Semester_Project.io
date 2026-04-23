@@ -1,7 +1,5 @@
 # Test Plan
 ## Unit Test
-## UI 
-## Recording
 ## Wave Table
 The following are the function in test_Wavetable.py followed by a descriptions. 
 - test_attack
@@ -34,8 +32,6 @@ The following are the function in test_Wavetable.py followed by a descriptions.
 - Boundary integration test for fitted envelope values
     - Set a short note duration and then choose large envelope values so that attack, decay, and release would otherwise exceed the note length.
     - Verify that the note still plays without crashing because the UI audio engine fits the envelope values to the selected duration before calling `synthictest2.Envelope.apply()`.
-- Not currently applicable
-    - A recording/file-output integration test is not included here because the current integrated MockUI code does not yet save audio to the file system.
 ## User Acceptance Testing
 The following test are to test for musical acurracy:
 ### C major Pitch testing 
