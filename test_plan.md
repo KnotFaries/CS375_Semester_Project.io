@@ -1,5 +1,36 @@
 # Test Plan
 ## Unit Test
+## UI 
+- test_generate_note_signal()
+    - test that the UI audio engine returns an output array for the selected note and waveform
+    - test that the returned signal stays in the valid audio range after clipping
+- test_fit_envelope_to_duration()
+    - test that attack, decay, and release are reduced when they are larger than the selected note duration
+    - test that sustain is preserved while the time-based values are adjusted
+- test_apply_settings()
+    - test that valid frequency input updates the mapped keys and status text
+    - test that invalid input keeps the UI from loading a new scale and shows an error message
+- test_get_audio_settings()
+    - test that the slider values are converted into the settings dictionary used by the audio engine
+- test_scrollable_controls()
+    - test that the left panel canvas updates its scroll region after the control cards are built
+    - test that mouse wheel scrolling changes the visible position of the left panel
+## Recording
+- test_recorder_add()
+    - test that each new signal is appended to the recording buffer in `synthictest2`
+- test_recorder_save()
+    - test that calling `save()` creates a wav file with the expected sample rate and audio data
+- test_start_recording()
+    - test that starting a recording in the MockUI clears the previous buffer and marks recording as active
+- test_stop_recording()
+    - test that stopping a recording marks it as inactive and leaves the sequence ready to save
+- test_record_note_signal()
+    - test that each played note is inserted into the recording buffer at the correct time offset
+    - test that multiple notes played during one session are all included in the saved sequence instead of only the last note
+- test_finalize_recording_length()
+    - test that the recording buffer is extended to the full elapsed time before saving
+- test_write_wav_file()
+    - test that the MockUI save method writes a wav file that can be opened and read back
 ## Wave Table
 The following are the function in test_Wavetable.py followed by a descriptions. 
 - test_attack
@@ -32,6 +63,12 @@ The following are the function in test_Wavetable.py followed by a descriptions.
 - Boundary integration test for fitted envelope values
     - Set a short note duration and then choose large envelope values so that attack, decay, and release would otherwise exceed the note length.
     - Verify that the note still plays without crashing because the UI audio engine fits the envelope values to the selected duration before calling `synthictest2.Envelope.apply()`.
+- MockUI recording workflow integration
+    - In the MockUI, start recording, play a short sequence of notes, stop recording, and save the output as a wav file.
+    - Verify that the created wav file exists, opens correctly, and contains the full sequence that was played rather than only the final note.
+- MockUI scroll and recording controls integration
+    - Launch the MockUI with the current left-side control layout and use the scrollbar or mouse wheel to reach the recording controls.
+    - Verify that the user can scroll the left panel, reach the recording buttons, and still use those controls without breaking the rest of the UI.
 ## User Acceptance Testing
 The following test are to test for musical acurracy:
 ### C major Pitch testing 
