@@ -1,5 +1,7 @@
 # Test Plan
 ## Unit Test
+## UI 
+## Recording
 ## Wave Table
 The following are the function in test_Wavetable.py followed by a descriptions. 
 - test_attack
