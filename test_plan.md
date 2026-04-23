@@ -32,3 +32,7 @@ Mi Mi Fa So So Fa Mi Re Do Do Re Mi Mi Re Re
 Mi Mi Fa So So Fa Mi Re Do Do Re Mi Re Do Do
 
 - Ode to joy, Ludwig van Bethoven 
+
+
+## Recording Test
+- Test the recording ability by playing any string of notes and hitting record, then check if there is an MP3 or Wav file.
