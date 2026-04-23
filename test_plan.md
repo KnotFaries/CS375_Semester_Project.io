@@ -17,7 +17,23 @@ The following are the function in test_Wavetable.py followed by a descriptions.
 - test_generate_wavetabel():
     - Given frequency, durration, and waveform, the out put shoul have some values in all parts of an array
 ## Integration Test
-- 
+- UI to Preset scale mapping integration
+    - Launch `UI/mock_synth_ui.py`, select each available scale type, enter a valid base frequency, and click `Apply Settings`.
+    - Verify that the on-screen key labels refresh to new note frequencies and that the status message matches the selected scale, base frequency, and waveform.
+- MockUI to WaveTable integration
+    - In the MockUI, change waveform, duration, gain, wavetable attack, and wavetable release, then press a mapped key.
+    - Verify that a note is produced through the speakers/headphones, that changing waveform changes the character of the sound, and that duration/attack/release changes are audible in the generated note.
+- MockUI to synthictest2 envelope integration
+    - Change the envelope attack, decay, sustain, and release sliders, then play the same note multiple times with different settings.
+    - Verify that the envelope shape changes as expected in the real output: slower attack delays the peak, lower sustain reduces held volume, and longer release makes the note fade out longer.
+- Full playback stack with real audio device
+    - Run the UI on a machine with a working audio output device and play notes using both mouse clicks and keyboard presses.
+    - Verify that key highlighting, current-note status text, and audible playback all stay synchronized, and that the UI does not raise playback errors during normal use.
+- Boundary integration test for fitted envelope values
+    - Set a short note duration and then choose large envelope values so that attack, decay, and release would otherwise exceed the note length.
+    - Verify that the note still plays without crashing because the UI audio engine fits the envelope values to the selected duration before calling `synthictest2.Envelope.apply()`.
+- Not currently applicable
+    - A recording/file-output integration test is not included here because the current integrated MockUI code does not yet save audio to the file system.
 ## User Acceptance Testing
 The following test are to test for musical acurracy:
 ### C major Pitch testing 

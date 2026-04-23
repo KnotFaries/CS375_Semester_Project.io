@@ -1,7 +1,9 @@
 from pathlib import Path
 import sys
+import time
 import tkinter as tk
-from tkinter import ttk
+from tkinter import filedialog, ttk
+import wave
 
 import numpy as np
 import sounddevice as sd
@@ -127,7 +129,7 @@ class SynthAudioEngine:
     def calculate_scale(self, base_freq, scale_type):
         return self.preset.calculate_scale(base_freq, scaletype=scale_type)
 
-    def play_note(self, freq, settings):
+    def generate_note_signal(self, freq, settings):
         signal = wt.generate_wavetable(freq, settings["duration"], self.waveforms[settings["waveform"]], SAMPLE_RATE)
         signal = wt.create_envelope(signal, settings["gain"], settings["wavetable_attack"], settings["wavetable_release"])
         envelope_settings = self._fit_envelope_to_duration(settings)
@@ -138,7 +140,10 @@ class SynthAudioEngine:
             sustain=envelope_settings["env_sustain"],
             release=envelope_settings["env_release"],
         )
-        signal = np.clip(signal, -1.0, 1.0)
+        return np.clip(signal, -1.0, 1.0)
+
+    def play_note(self, freq, settings):
+        signal = self.generate_note_signal(freq, settings)
         sd.play(signal, SAMPLE_RATE, blocking=False)
         return signal
 
@@ -204,6 +209,16 @@ class SynthMockUI:
 
         self.key_widgets = {}
         self.slider_vars = {}
+        self.last_rendered_signal = None
+        self.last_rendered_frequency = None
+        self.recording_var = tk.StringVar(value="Recording: idle")
+        self.recording_active = False
+        self.recording_start_time = None
+        self.recorded_signal = np.zeros(0, dtype=np.float32)
+        self.recording_has_audio = False
+        self.controls_canvas = None
+        self.controls_inner = None
+        self.controls_window = None
 
         self._configure_styles()
         self._build_layout()
@@ -246,8 +261,59 @@ class SynthMockUI:
         right_panel = tk.Frame(content, bg="#fffaf2")
         right_panel.pack(side="left", fill="both", expand=True, pady=(52, 8))
 
-        self._build_controls(left_panel)
+        self._build_scrollable_controls(left_panel)
         self._build_keyboard(right_panel)
+
+    def _build_scrollable_controls(self, parent):
+        canvas_holder = tk.Frame(parent, bg="#fffaf2")
+        canvas_holder.pack(fill="both", expand=True)
+
+        self.controls_canvas = tk.Canvas(
+            canvas_holder,
+            bg="#fffaf2",
+            highlightthickness=0,
+            bd=0,
+        )
+        scrollbar = ttk.Scrollbar(canvas_holder, orient="vertical", command=self.controls_canvas.yview)
+        self.controls_canvas.configure(yscrollcommand=scrollbar.set)
+
+        scrollbar.pack(side="right", fill="y")
+        self.controls_canvas.pack(side="left", fill="both", expand=True)
+
+        self.controls_inner = tk.Frame(self.controls_canvas, bg="#fffaf2")
+        self.controls_window = self.controls_canvas.create_window((0, 0), window=self.controls_inner, anchor="nw")
+
+        self.controls_inner.bind("<Configure>", self._update_controls_scrollregion)
+        self.controls_canvas.bind("<Configure>", self._resize_controls_window)
+
+        self._build_controls(self.controls_inner)
+        self._bind_controls_mousewheel(self.controls_canvas)
+        self._bind_controls_mousewheel(self.controls_inner)
+
+    def _update_controls_scrollregion(self, _event=None):
+        if self.controls_canvas is not None:
+            self.controls_canvas.configure(scrollregion=self.controls_canvas.bbox("all"))
+
+    def _resize_controls_window(self, event):
+        if self.controls_canvas is not None and self.controls_window is not None:
+            self.controls_canvas.itemconfigure(self.controls_window, width=event.width)
+
+    def _bind_controls_mousewheel(self, widget):
+        widget.bind("<Enter>", self._enable_controls_mousewheel)
+        widget.bind("<Leave>", self._disable_controls_mousewheel)
+
+    def _enable_controls_mousewheel(self, _event=None):
+        self.root.bind_all("<MouseWheel>", self._scroll_controls_mousewheel)
+
+    def _disable_controls_mousewheel(self, _event=None):
+        self.root.unbind_all("<MouseWheel>")
+
+    def _scroll_controls_mousewheel(self, event):
+        if self.controls_canvas is None:
+            return
+        scroll_units = -1 * int(event.delta / 120) if event.delta else 0
+        if scroll_units != 0:
+            self.controls_canvas.yview_scroll(scroll_units, "units")
 
     def _build_controls(self, parent):
         config_card = tk.Frame(parent, bg="#f8f2e7", bd=0, highlightthickness=1, highlightbackground="#dfd2bd")
@@ -316,8 +382,31 @@ class SynthMockUI:
         ttk.Label(status_card, textvariable=self.current_key_var, style="CardBody.TLabel", wraplength=280).pack(
             anchor="w",
             padx=14,
-            pady=(6, 14),
+            pady=(6, 4),
         )
+        ttk.Label(status_card, textvariable=self.recording_var, style="CardBody.TLabel", wraplength=280).pack(
+            anchor="w",
+            padx=14,
+            pady=(0, 10),
+        )
+        ttk.Button(
+            status_card,
+            text="Start Recording",
+            style="Primary.TButton",
+            command=self._start_recording,
+        ).pack(fill="x", padx=14, pady=(0, 8))
+        ttk.Button(
+            status_card,
+            text="Stop Recording",
+            style="Primary.TButton",
+            command=self._stop_recording,
+        ).pack(fill="x", padx=14, pady=(0, 8))
+        ttk.Button(
+            status_card,
+            text="Save Recording",
+            style="Primary.TButton",
+            command=self._save_recording,
+        ).pack(fill="x", padx=14, pady=(0, 14))
 
     def _build_dropdown(self, parent, label_text, variable, values):
         ttk.Label(parent, text=label_text, style="CardBody.TLabel").pack(anchor="w", padx=14, pady=(8, 4))
@@ -476,7 +565,10 @@ class SynthMockUI:
 
     def _play_note_for_key(self, key_name, frequency):
         try:
-            self.audio_engine.play_note(frequency, self._get_audio_settings())
+            signal = self.audio_engine.play_note(frequency, self._get_audio_settings())
+            self.last_rendered_signal = np.array(signal, copy=True)
+            self.last_rendered_frequency = frequency
+            self._record_note_signal(signal)
             self.status_var.set(f"Pressed {key_name} at {frequency:.2f} Hz.")
         except Exception as error:
             self.status_var.set(f"Audio playback error: {error}")
@@ -544,6 +636,103 @@ class SynthMockUI:
             "env_release": round(self.slider_vars["env_release"].get(), 2),
             "waveform": self.waveform_var.get(),
         }
+
+    def _start_recording(self):
+        if self.recording_active:
+            self.status_var.set("Recording is already running.")
+            return
+
+        self.recording_active = True
+        self.recording_start_time = time.monotonic()
+        self.recorded_signal = np.zeros(0, dtype=np.float32)
+        self.recording_has_audio = False
+        self.recording_var.set("Recording: active")
+        self.status_var.set("Recording started.")
+
+    def _stop_recording(self):
+        if not self.recording_active:
+            if self.recording_has_audio:
+                self.status_var.set("Recording is already stopped.")
+            else:
+                self.status_var.set("Start recording before stopping.")
+            return
+
+        self._finalize_recording_length()
+        self.recording_active = False
+        self.recording_start_time = None
+
+        if self.recording_has_audio:
+            self.recording_var.set("Recording: stopped and ready to save")
+            self.status_var.set("Recording stopped. You can now save the WAV file.")
+        else:
+            self.recording_var.set("Recording: stopped with no notes")
+            self.status_var.set("Recording stopped, but no notes were captured.")
+
+    def _save_recording(self):
+        if self.recording_active:
+            self._stop_recording()
+
+        if not self.recording_has_audio or self.recorded_signal.size == 0:
+            self.status_var.set("Record at least one note before saving.")
+            return
+
+        default_name = "mockui_recording.wav"
+        if self.last_rendered_frequency is not None:
+            default_name = f"mockui_recording_{self.last_rendered_frequency:.2f}Hz.wav"
+
+        target_path = filedialog.asksaveasfilename(
+            title="Save Synth Output",
+            defaultextension=".wav",
+            initialfile=default_name,
+            filetypes=[("WAV audio", "*.wav")],
+        )
+
+        if not target_path:
+            self.status_var.set("Save cancelled.")
+            return
+
+        try:
+            self._write_wav_file(target_path, self.recorded_signal)
+            self.status_var.set(f"Saved audio to {Path(target_path).name}.")
+        except Exception as error:
+            self.status_var.set(f"Save error: {error}")
+
+    def _record_note_signal(self, signal):
+        if not self.recording_active or self.recording_start_time is None:
+            return
+
+        start_sample = int(max(0.0, time.monotonic() - self.recording_start_time) * SAMPLE_RATE)
+        end_sample = start_sample + len(signal)
+
+        if end_sample > self.recorded_signal.size:
+            extended = np.zeros(end_sample, dtype=np.float32)
+            if self.recorded_signal.size > 0:
+                extended[: self.recorded_signal.size] = self.recorded_signal
+            self.recorded_signal = extended
+
+        self.recorded_signal[start_sample:end_sample] += np.asarray(signal, dtype=np.float32)
+        self.recording_has_audio = True
+        self.recording_var.set("Recording: active")
+
+    def _finalize_recording_length(self):
+        if self.recording_start_time is None:
+            return
+
+        elapsed_samples = int(max(0.0, time.monotonic() - self.recording_start_time) * SAMPLE_RATE)
+        if elapsed_samples > self.recorded_signal.size:
+            extended = np.zeros(elapsed_samples, dtype=np.float32)
+            if self.recorded_signal.size > 0:
+                extended[: self.recorded_signal.size] = self.recorded_signal
+            self.recorded_signal = extended
+
+    def _write_wav_file(self, target_path, signal):
+        audio = np.clip(np.asarray(signal, dtype=np.float32), -1.0, 1.0)
+        pcm_audio = np.int16(audio * 32767)
+        with wave.open(target_path, "wb") as wav_file:
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(SAMPLE_RATE)
+            wav_file.writeframes(pcm_audio.tobytes())
 
     def _format_slider_value(self, value, decimals):
         if decimals == 0:
