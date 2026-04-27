@@ -54,13 +54,7 @@ class Synth:
         self.osc2 = Oscillator("saw")
         self.osc3 = Oscillator("square")
         self.env = Envelope()
-
-
-
-        self.env = Envelope()
         self.recorder = recorder
-
-
 
     def play_note(self, freq, duration=1.0):
         sine = self.osc1.generate(freq, duration, 0.4)
@@ -136,7 +130,6 @@ class Recorder:
         audio = np.concatenate(self.buffer)
         sf.write(filename, audio, SAMPLE_RATE)
         print(f"Saved recording to {filename}")
-
 
 
 if __name__ == "__main__":
