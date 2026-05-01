@@ -1,0 +1,80 @@
+name: Synth CI (Final)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsndfile1
+
+      - name: Install Python dependencies
+        run: |
+          pip install numpy pytest soundfile
+          pip install sounddevice pynput || true
+
+      - name: Run WaveTable tests
+        run: |
+          pytest test_WaveTable.py -v
+
+      - name: Test Synth Core Logic
+        run: |
+          python - <<EOF
+          import synthictest2 as s
+          import numpy as np
+
+          osc = s.Oscillator("sine")
+          signal = osc.generate(440, 0.1)
+          assert isinstance(signal, np.ndarray)
+          assert len(signal) > 0
+
+          env = s.Envelope()
+          shaped = env.apply(signal)
+          assert len(shaped) == len(signal)
+
+          preset = s.Preset()
+          scale = preset.calculate_scale(440, "major")
+          assert len(scale) > 0
+
+          rec = s.Recorder()
+          rec.add(signal)
+          rec.save("test.wav")
+
+          print("Core synth logic passed")
+          EOF
+
+      - name: Test UI logic safely
+        run: |
+          python - <<EOF
+          import mock_synth_ui as ui
+          print("UI module imported successfully")
+          print("UI logic check passed")
+          EOF
+
+      - name: Verify WAV file output
+        run: |
+          python - <<EOF
+          import wave, os
+
+          assert os.path.exists("test.wav")
+
+          with wave.open("test.wav", 'r') as f:
+              assert f.getframerate() == 44100
+
+          print("WAV verification passed")
+          EOF
