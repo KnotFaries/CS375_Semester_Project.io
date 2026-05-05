@@ -1,5 +1,5 @@
 # CS375 Semester Project
-Here is the semester long project for CS375, durring the spring 2026 semester. This project is being completed by Izayah Carlton, Brain Jeffers, Evan Mai and Maia Mendoza. 
+Here is the semester long project for CS375, durring the spring 2026 semester. This project is being completed by Izayah Carlton, Brian Jeffers, Evan Mai and Maia Mendoza. 
 
 ## Assignment Links: 
 The following are links to what is handed in for assignments, exculding the weekly standups. 
