@@ -14,7 +14,11 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from SoundGenerationClasses import WaveTable as wt
-from SoundGenerationClasses.synthictest2 import Envelope, Preset, SAMPLE_RATE
+
+try:
+    from SoundGenerationClasses.synthictest2 import Envelope, Preset, SAMPLE_RATE
+except ModuleNotFoundError:
+    from synthictest2 import Envelope, Preset, SAMPLE_RATE
 
 
 class NumberInput:
@@ -73,7 +77,7 @@ class NumberInput:
 
 
 class KeyInput:
-    KEYS_ON_SCREEN = ["A", "W", "S", "E", "D", "F", "T", "G", "Y", "H", "U", "J"]
+    KEYS_ON_SCREEN = ["A", "W", "S", "E", "D", "F", "T", "G", "Y", "H", "U", "J", "K"]
 
     def __init__(self):
         self.key_map = {}
@@ -81,14 +85,16 @@ class KeyInput:
         self.listener_running = False
         self.last_pressed_key = None
 
-    def setup_key_map(self, scale):
+    def setup_key_map(self, notes):
         self.key_map.clear()
         self.active_keys.clear()
         self.last_pressed_key = None
 
-        for index, key_name in enumerate(self.KEYS_ON_SCREEN):
-            if index < len(scale):
-                self.key_map[key_name] = scale[index]
+        for index, note in enumerate(notes):
+            if isinstance(note, dict):
+                self.key_map[note["key"]] = note["frequency"]
+            elif index < len(self.KEYS_ON_SCREEN):
+                self.key_map[self.KEYS_ON_SCREEN[index]] = note
 
     def on_press(self, key_name):
         key_name = str(key_name).upper()
@@ -187,15 +193,66 @@ class SynthAudioEngine:
 
 
 class SynthMockUI:
-    WHITE_KEYS = ["A", "S", "D", "F", "G", "H", "J"]
+    WHITE_KEYS = ["A", "S", "D", "F", "G", "H", "J", "K"]
     BLACK_KEYS = ["W", "E", "T", "Y", "U"]
+    KEY_ORDER = ["A", "W", "S", "E", "D", "F", "T", "G", "Y", "H", "U", "J", "K"]
+    KEY_FOR_SEMITONE = {
+        0: "A",
+        1: "W",
+        2: "S",
+        3: "E",
+        4: "D",
+        5: "F",
+        6: "T",
+        7: "G",
+        8: "Y",
+        9: "H",
+        10: "U",
+        11: "J",
+        12: "K",
+    }
+    KEY_SOLFEGE = {
+        "A": "Do",
+        "W": "Ra",
+        "S": "Re",
+        "E": "Me",
+        "D": "Mi",
+        "F": "Fa",
+        "T": "Se",
+        "G": "Sol",
+        "Y": "Le",
+        "H": "La",
+        "U": "Te",
+        "J": "Ti",
+        "K": "Do",
+    }
+    SCALE_DEGREES = {
+        "chroma": [
+            (0, "Do"),
+            (1, "Ra"),
+            (2, "Re"),
+            (3, "Me"),
+            (4, "Mi"),
+            (5, "Fa"),
+            (6, "Se"),
+            (7, "Sol"),
+            (8, "Le"),
+            (9, "La"),
+            (10, "Te"),
+            (11, "Ti"),
+            (12, "Do"),
+        ],
+        "major": [(0, "Do"), (2, "Re"), (4, "Mi"), (5, "Fa"), (7, "Sol"), (9, "La"), (11, "Ti"), (12, "Do")],
+        "minor": [(0, "Do"), (2, "Re"), (3, "Me"), (5, "Fa"), (7, "Sol"), (8, "Le"), (10, "Te"), (12, "Do")],
+        "penta": [(0, "Do"), (2, "Re"), (4, "Mi"), (7, "Sol"), (9, "La"), (12, "Do")],
+    }
 
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("CS375 Synthesizer UI Mockup")
-        self.root.geometry("1120x760")
+        self.root.geometry("1220x760")
         self.root.configure(bg="#f2efe8")
-        self.root.minsize(980, 700)
+        self.root.minsize(1080, 700)
 
         self.audio_engine = SynthAudioEngine()
         self.key_input = KeyInput()
@@ -208,6 +265,7 @@ class SynthMockUI:
         self.current_key_var = tk.StringVar(value="Current note: none")
 
         self.key_widgets = {}
+        self.key_note_labels = {}
         self.slider_vars = {}
         self.last_rendered_signal = None
         self.last_rendered_frequency = None
@@ -247,7 +305,7 @@ class SynthMockUI:
         ttk.Label(header, text="Synthesizer UI!! :D", style="Header.TLabel").pack(anchor="w")
         ttk.Label(
             header,
-            text="The mock UI now matches the current WaveTable and synthictest2 controls.",
+            text="WORKING UI",
             style="Sub.TLabel",
         ).pack(anchor="w", pady=(2, 0))
 
@@ -364,7 +422,7 @@ class SynthMockUI:
         ttk.Label(envelope_card, text="Envelope", style="CardTitle.TLabel").pack(anchor="w", padx=14, pady=(14, 4))
         ttk.Label(
             envelope_card,
-            text="These sliders mirror synthictest2 attack, decay, sustain, and release.",
+            text="These sliders mirror attack, decay, sustain, and release.",
             style="CardBody.TLabel",
             wraplength=280,
         ).pack(anchor="w", padx=14, pady=(0, 10))
@@ -476,36 +534,38 @@ class SynthMockUI:
         black_row = tk.Frame(keyboard_frame, bg="#d9cab3", height=110)
         black_row.pack(fill="x")
 
-        black_positions = {"W": 1, "E": 2, "T": 4, "Y": 5, "U": 6}
+        for column in range(15):
+            black_row.columnconfigure(column, weight=1, uniform="black-keyboard")
+
+        black_positions = {"W": 1, "E": 3, "T": 7, "Y": 9, "U": 11}
         for key_name, column in black_positions.items():
-            spacer = tk.Frame(black_row, bg="#d9cab3", width=18)
-            spacer.grid(row=0, column=column * 2, padx=8)
             button = tk.Label(
                 black_row,
-                text=key_name,
+                text=self._format_key_label(key_name),
                 bg="#1f2933",
                 fg="#fffaf2",
-                width=7,
-                height=5,
+                width=8,
+                height=6,
                 relief="flat",
-                font=("Segoe UI", 9, "bold"),
+                font=("Segoe UI", 8, "bold"),
                 cursor="hand2",
                 justify="center",
             )
-            button.grid(row=0, column=column * 2 + 1, padx=2)
+            button.grid(row=0, column=column, padx=2, sticky="nsew")
             self.key_widgets[key_name] = button
             self._bind_mouse_events(button, key_name)
 
         white_row = tk.Frame(keyboard_frame, bg="#d9cab3")
         white_row.pack(fill="x", pady=(8, 0))
 
-        for key_name in self.WHITE_KEYS:
+        for column, key_name in enumerate(self.WHITE_KEYS):
+            white_row.columnconfigure(column, weight=1, uniform="white-keyboard")
             button = tk.Label(
                 white_row,
-                text=key_name,
+                text=self._format_key_label(key_name),
                 bg="#fffaf2",
                 fg="#1f2933",
-                width=10,
+                width=8,
                 height=9,
                 relief="solid",
                 bd=1,
@@ -513,7 +573,7 @@ class SynthMockUI:
                 cursor="hand2",
                 justify="center",
             )
-            button.pack(side="left", padx=3)
+            button.grid(row=0, column=column, padx=3, sticky="nsew")
             self.key_widgets[key_name] = button
             self._bind_mouse_events(button, key_name)
 
@@ -539,14 +599,36 @@ class SynthMockUI:
             self.status_var.set("Base frequency must be a number between 20 and 20000 Hz.")
             return
 
-        scale = self.audio_engine.calculate_scale(typed_value, self.scale_var.get())
-        self.key_input.setup_key_map(scale)
+        scale_type = self.scale_var.get()
+        scale = self.audio_engine.calculate_scale(typed_value, "chroma")
+        note_entries = self._build_note_entries(typed_value, "chroma", scale)
+        self.key_note_labels = {note["key"]: note["solfege"] for note in note_entries}
+        self.key_input.setup_key_map(note_entries)
         self.clear_active_keys()
         self._refresh_keyboard_labels()
         self.status_var.set(
-            f"Loaded {self.scale_var.get()} scale from {typed_value:.2f} Hz with {self.waveform_var.get()} waveform."
+            f"Loaded all keyboard notes from {typed_value:.2f} Hz with {self.waveform_var.get()} waveform."
         )
         self._update_active_notes_label()
+
+    def _build_note_entries(self, base_frequency, scale_type, scale):
+        degrees = self.SCALE_DEGREES.get(scale_type, self.SCALE_DEGREES["chroma"])
+        frequencies = list(scale)
+
+        for semitone, _solfege in degrees[len(frequencies) :]:
+            frequencies.append(base_frequency * (2 ** (semitone / 12)))
+
+        note_entries = []
+        for (semitone, solfege), frequency in zip(degrees, frequencies):
+            key_name = self.KEY_FOR_SEMITONE[semitone]
+            note_entries.append(
+                {
+                    "key": key_name,
+                    "solfege": solfege,
+                    "frequency": frequency,
+                }
+            )
+        return note_entries
 
     def _press_key(self, key_name):
         if key_name not in self.key_input.key_map:
@@ -569,7 +651,8 @@ class SynthMockUI:
             self.last_rendered_signal = np.array(signal, copy=True)
             self.last_rendered_frequency = frequency
             self._record_note_signal(signal)
-            self.status_var.set(f"Pressed {key_name} at {frequency:.2f} Hz.")
+            solfege = self.key_note_labels.get(key_name, self.KEY_SOLFEGE.get(key_name, key_name))
+            self.status_var.set(f"Pressed {key_name} ({solfege}) at {frequency:.2f} Hz.")
         except Exception as error:
             self.status_var.set(f"Audio playback error: {error}")
 
@@ -601,7 +684,8 @@ class SynthMockUI:
         if current_key:
             frequency = self.key_input.key_map.get(current_key)
             if frequency is not None:
-                self.current_key_var.set(f"Current note: {current_key} ({frequency:.2f} Hz)")
+                solfege = self.key_note_labels.get(current_key, self.KEY_SOLFEGE.get(current_key, current_key))
+                self.current_key_var.set(f"Current note: {current_key} {solfege} ({frequency:.2f} Hz)")
                 return
         self.current_key_var.set("Current note: none")
 
@@ -616,13 +700,19 @@ class SynthMockUI:
             self._release_key(key_name)
 
     def _refresh_keyboard_labels(self):
-        for key_name, widget in self.key_widgets.items():
+        for key_name in self.KEY_ORDER:
+            widget = self.key_widgets.get(key_name)
+            if widget is None:
+                continue
+
             frequency = self.key_input.key_map.get(key_name)
-            if frequency is None:
-                widget.configure(text=f"{key_name}\n--")
-            else:
-                widget.configure(text=f"{key_name}\n{frequency:.2f}")
+            widget.configure(text=self._format_key_label(key_name, frequency))
             self._set_key_visual(key_name, False)
+
+    def _format_key_label(self, key_name, frequency=None):
+        solfege = self.key_note_labels.get(key_name, self.KEY_SOLFEGE.get(key_name, key_name))
+        frequency_text = "-- Hz" if frequency is None else f"{frequency:.2f} Hz"
+        return f"{key_name}\n{solfege}\n{frequency_text}"
 
     def _get_audio_settings(self):
         return {
