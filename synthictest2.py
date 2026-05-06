@@ -55,12 +55,8 @@ class Synth:
         self.osc3 = Oscillator("square")
         self.env = Envelope()
 
-
-
         self.env = Envelope()
         self.recorder = recorder
-
-
 
     def play_note(self, freq, duration=1.0):
         sine = self.osc1.generate(freq, duration, 0.4)
@@ -120,7 +116,6 @@ class KeyInput:
         ) as listener:
             listener.join()
 
-
 class Recorder:
     def __init__(self):
         self.buffer = []
@@ -136,8 +131,6 @@ class Recorder:
         audio = np.concatenate(self.buffer)
         sf.write(filename, audio, SAMPLE_RATE)
         print(f"Saved recording to {filename}")
-
-
 
 if __name__ == "__main__":
     base_freq = 261.63  # C4

@@ -25,4 +25,4 @@ Set up a linter. Currently we use PEP 8 as a style guide. If you are using an an
     - method names use snake
 ## Commit Messages 
 - Names are clear and conscie
-- summary has the longer explination 
+-summary has the longer explination 
