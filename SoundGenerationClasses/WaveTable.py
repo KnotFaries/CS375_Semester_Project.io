@@ -118,7 +118,7 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
         DESCRIPTION.
     Returns
     -------
-    None.
+    array.
 
     """
     
