@@ -1,0 +1,1 @@
+This is an explainer to prime you on how the various methods work together. Most the sound generation methods are used inside the method generate_wavetable. 

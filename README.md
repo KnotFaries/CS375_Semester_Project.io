@@ -22,7 +22,7 @@ The following documntation is orentation for tenchincal users, or users who wish
 
 For a quick and dirty start, read through [our contrubing file](https://knotfaries.github.io/CS375_Semester_Project.io/HowToContribute). 
 
-For a tutorial on how major methods work please read through our [Technical Tutorial page ](https://knotfaries.github.io/CS375_Semester_Project.io/TechnicalTutorial)
+For a tutorial on how major methods work please read through our [Technical Explainer page ](https://knotfaries.github.io/CS375_Semester_Project.io/TechnicalTutorial)
 
 For a complete refrence for how each method works, including mathmatical explinations and method inputs please look through [Method Refrences](https://knotfaries.github.io/CS375_Semester_Project.io/MethodRefrences)
 
