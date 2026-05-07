@@ -11,7 +11,7 @@ Also make sure you have python and the following libraires: souddivece, tkinter,
 Set up a linter. Currently we use PEP 8 as a style guide. If you are using an andcoda IDE you should be fine. 
 ## Branching
 - 'main' is alwasy deployable. Never comit directly to main. 
--Branch name: clear and concise
+- Branch name: clear and concise
     - When working with features or fixes use 'feature/description'
     - When working with documetaiong use 'doc/name_of_doc/date_range'
 ## Pull Request
