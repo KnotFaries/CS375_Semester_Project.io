@@ -118,7 +118,7 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
         DESCRIPTION.
     Returns
     -------
-    None.
+    array.
 
     """
     
@@ -152,5 +152,3 @@ def generate_wavetable(frequency, durration, waveform, sample_rate = 44100):
     
       
     return output
-
-a = generate_wavetable(440, 1, np.sin)
