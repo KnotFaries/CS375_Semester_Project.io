@@ -1,6 +1,27 @@
 from pathlib import Path
+import os
 import sys
-import time
+import threading
+
+
+def _configure_tcl_tk_paths():
+    base_paths = []
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        base_paths.append(Path(sys._MEIPASS))
+    base_paths.append(Path(sys.executable).resolve().parent)
+    base_paths.append(Path(sys.base_prefix))
+
+    for base_path in base_paths:
+        tcl_library = base_path / "tcl" / "tcl8.6"
+        tk_library = base_path / "tcl" / "tk8.6"
+        if tcl_library.exists() and tk_library.exists():
+            os.environ.setdefault("TCL_LIBRARY", str(tcl_library))
+            os.environ.setdefault("TK_LIBRARY", str(tk_library))
+            return
+
+
+_configure_tcl_tk_paths()
+
 import tkinter as tk
 from tkinter import filedialog, ttk
 import wave
@@ -13,12 +34,10 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from SoundGenerationClasses import WaveTable as wt
-
 try:
-    from SoundGenerationClasses.synthictest2 import Envelope, Preset, SAMPLE_RATE
+    from SoundGenerationClasses.synthictest2 import Preset, SAMPLE_RATE
 except ModuleNotFoundError:
-    from synthictest2 import Envelope, Preset, SAMPLE_RATE
+    from synthictest2 import Preset, SAMPLE_RATE
 
 
 class NumberInput:
@@ -122,77 +141,252 @@ class KeyInput:
 
 
 class SynthAudioEngine:
+    TWO_PI = 2 * np.pi
+    MIN_TAP_SECONDS = 0.05
+
     def __init__(self):
         self.preset = Preset()
-        self.envelope = Envelope()
-        self.waveforms = {
-            "sine": np.sin,
-            "square": self._square_wave,
-            "saw": self._saw_wave,
-            "triangle": self._triangle_wave,
-        }
+        self.lock = threading.RLock()
+        self.voices = []
+        self.stream = None
+        self.recording_active = False
+        self.recording_chunks = []
+        self.recording_has_audio = False
+        self.last_stream_status = None
 
     def calculate_scale(self, base_freq, scale_type):
         return self.preset.calculate_scale(base_freq, scaletype=scale_type)
 
-    def generate_note_signal(self, freq, settings):
-        signal = wt.generate_wavetable(freq, settings["duration"], self.waveforms[settings["waveform"]], SAMPLE_RATE)
-        signal = wt.create_envelope(signal, settings["gain"], settings["wavetable_attack"], settings["wavetable_release"])
-        envelope_settings = self._fit_envelope_to_duration(settings)
-        signal = self.envelope.apply(
-            signal,
-            attack=envelope_settings["env_attack"],
-            decay=envelope_settings["env_decay"],
-            sustain=envelope_settings["env_sustain"],
-            release=envelope_settings["env_release"],
+    def note_on(self, key_name, freq, settings):
+        self.start_stream()
+        with self.lock:
+            self.voices.append(self._create_voice(key_name, freq, settings))
+
+    def note_off(self, key_name):
+        with self.lock:
+            for voice in self.voices:
+                if voice["key_name"] == key_name and voice["stage"] != "release":
+                    self._begin_release(voice)
+
+    def clear_voices(self):
+        with self.lock:
+            self.voices.clear()
+
+    def start_recording(self):
+        self.start_stream()
+        with self.lock:
+            self.recording_chunks = []
+            self.recording_has_audio = False
+            self.recording_active = True
+
+    def stop_recording(self):
+        with self.lock:
+            self.recording_active = False
+            return self.get_recording_signal()
+
+    def get_recording_signal(self):
+        if not self.recording_chunks:
+            return np.zeros(0, dtype=np.float32)
+        return np.concatenate(self.recording_chunks).astype(np.float32, copy=False)
+
+    def close(self):
+        with self.lock:
+            self.voices.clear()
+            self.recording_active = False
+        if self.stream is not None:
+            self.stream.stop()
+            self.stream.close()
+            self.stream = None
+
+    def start_stream(self):
+        if self.stream is not None and self.stream.active:
+            return
+
+        if self.stream is not None:
+            self.stream.close()
+            self.stream = None
+
+        stream = sd.OutputStream(
+            channels=1,
+            samplerate=SAMPLE_RATE,
+            dtype="float32",
+            blocksize=512,
+            callback=self._audio_callback,
         )
-        return np.clip(signal, -1.0, 1.0)
+        try:
+            stream.start()
+        except Exception:
+            stream.close()
+            raise
+        self.stream = stream
 
-    def play_note(self, freq, settings):
-        signal = self.generate_note_signal(freq, settings)
-        sd.play(signal, SAMPLE_RATE, blocking=False)
-        return signal
+    def _audio_callback(self, outdata, frames, _time_info, status):
+        if status:
+            self.last_stream_status = str(status)
 
-    @staticmethod
-    def _fit_envelope_to_duration(settings):
-        duration = max(0.0, float(settings["duration"]))
-        attack = max(0.0, float(settings["env_attack"]))
-        decay = max(0.0, float(settings["env_decay"]))
-        release = max(0.0, float(settings["env_release"]))
+        with self.lock:
+            mixed = np.zeros(frames, dtype=np.float32)
+            live_voices = []
 
-        if attack > duration:
-            attack = duration
+            for voice in self.voices:
+                mixed += self._render_voice(voice, frames)
+                if not voice["finished"]:
+                    live_voices.append(voice)
 
-        remaining = max(0.0, duration - attack)
-        if decay > remaining:
-            decay = remaining
+            self.voices = live_voices
+            output = np.tanh(mixed).astype(np.float32)
 
-        remaining = max(0.0, duration - attack - decay)
-        if release > remaining:
-            release = remaining
+            if self.recording_active:
+                self.recording_chunks.append(output.copy())
+                if np.any(np.abs(output) > 0.0001):
+                    self.recording_has_audio = True
+
+        outdata[:, 0] = output
+
+    def _create_voice(self, key_name, freq, settings):
+        attack_samples = int(max(0.0, float(settings["env_attack"])) * SAMPLE_RATE)
+        decay_samples = int(max(0.0, float(settings["env_decay"])) * SAMPLE_RATE)
+        release_samples = int(max(0.0, float(settings["env_release"])) * SAMPLE_RATE)
+        sustain = min(1.0, max(0.0, float(settings["env_sustain"])))
+        gain_amp = 10 ** (float(settings["gain"]) / 20)
 
         return {
-            "env_attack": attack,
-            "env_decay": decay,
-            "env_sustain": float(settings["env_sustain"]),
-            "env_release": release,
+            "key_name": key_name,
+            "frequency": float(freq),
+            "waveform": settings["waveform"],
+            "phase": 0.0,
+            "phase_increment": self.TWO_PI * float(freq) / SAMPLE_RATE,
+            "gain_amp": gain_amp,
+            "attack_samples": attack_samples,
+            "decay_samples": decay_samples,
+            "sustain": sustain,
+            "release_samples": release_samples,
+            "stage": "attack",
+            "stage_position": 0,
+            "age_samples": 0,
+            "min_tap_samples": int(self.MIN_TAP_SECONDS * SAMPLE_RATE),
+            "release_requested": False,
+            "level": 0.0,
+            "release_start_level": 0.0,
+            "finished": False,
         }
 
-    @staticmethod
-    def _square_wave(phase):
-        return np.sign(np.sin(phase))
+    def _render_voice(self, voice, frames):
+        phases = (voice["phase"] + voice["phase_increment"] * np.arange(frames)) % self.TWO_PI
+        voice["phase"] = (voice["phase"] + voice["phase_increment"] * frames) % self.TWO_PI
+
+        oscillator = self._render_waveform(voice["waveform"], phases)
+        envelope = np.empty(frames, dtype=np.float32)
+        for index in range(frames):
+            envelope[index] = self._advance_envelope(voice)
+
+        return (oscillator * envelope * voice["gain_amp"]).astype(np.float32)
+
+    def _advance_envelope(self, voice):
+        if not voice["finished"]:
+            voice["age_samples"] += 1
+            if (
+                voice["release_requested"]
+                and voice["age_samples"] >= voice["min_tap_samples"]
+                and voice["stage"] != "release"
+            ):
+                self._begin_release(voice, force=True)
+
+        while True:
+            stage = voice["stage"]
+
+            if voice["finished"]:
+                return 0.0
+
+            if stage == "attack":
+                if voice["attack_samples"] <= 0:
+                    voice["level"] = 1.0
+                    voice["stage"] = "decay"
+                    voice["stage_position"] = 0
+                    continue
+
+                voice["stage_position"] += 1
+                voice["level"] = min(1.0, voice["stage_position"] / voice["attack_samples"])
+                if voice["stage_position"] >= voice["attack_samples"]:
+                    voice["stage"] = "decay"
+                    voice["stage_position"] = 0
+                return voice["level"]
+
+            if stage == "decay":
+                if voice["decay_samples"] <= 0:
+                    voice["level"] = voice["sustain"]
+                    voice["stage"] = "sustain"
+                    voice["stage_position"] = 0
+                    continue
+
+                voice["stage_position"] += 1
+                progress = min(1.0, voice["stage_position"] / voice["decay_samples"])
+                voice["level"] = 1.0 + (voice["sustain"] - 1.0) * progress
+                if voice["stage_position"] >= voice["decay_samples"]:
+                    voice["stage"] = "sustain"
+                    voice["stage_position"] = 0
+                return voice["level"]
+
+            if stage == "sustain":
+                voice["level"] = voice["sustain"]
+                return voice["level"]
+
+            if stage == "release":
+                if voice["release_samples"] <= 0:
+                    voice["level"] = 0.0
+                    voice["finished"] = True
+                    return 0.0
+
+                voice["stage_position"] += 1
+                progress = min(1.0, voice["stage_position"] / voice["release_samples"])
+                voice["level"] = voice["release_start_level"] * (1.0 - progress)
+                if voice["stage_position"] >= voice["release_samples"]:
+                    voice["level"] = 0.0
+                    voice["finished"] = True
+                return max(0.0, voice["level"])
+
+            voice["finished"] = True
+            return 0.0
+
+    def _begin_release(self, voice, force=False):
+        if voice["stage"] == "release" or voice["finished"]:
+            return
+        if not force and voice["age_samples"] < voice["min_tap_samples"]:
+            voice["release_requested"] = True
+            return
+
+        voice["stage"] = "release"
+        voice["stage_position"] = 0
+        voice["release_start_level"] = voice["level"]
+        voice["release_requested"] = False
 
     @staticmethod
-    def _saw_wave(phase):
-        cycle_position = phase / (2 * np.pi)
-        return 2 * (cycle_position - np.floor(0.5 + cycle_position))
-
-    @staticmethod
-    def _triangle_wave(phase):
-        return 2 * np.arcsin(np.sin(phase)) / np.pi
+    def _render_waveform(waveform, phase):
+        if waveform == "square":
+            return np.where(np.sin(phase) >= 0, 1.0, -1.0)
+        if waveform == "saw":
+            cycle_position = phase / (2 * np.pi)
+            return 2 * (cycle_position - np.floor(0.5 + cycle_position))
+        if waveform == "triangle":
+            return 2 * np.arcsin(np.sin(phase)) / np.pi
+        return np.sin(phase)
 
 
 class SynthMockUI:
+    BASE_BG = "#1f2933"
+    PANEL_BG = "#263545"
+    CARD_BG = "#2f3d4d"
+    CARD_ALT_BG = "#34475a"
+    TEXT_COLOR = "#e6edf3"
+    MUTED_TEXT = "#b7c4d1"
+    ACCENT = "#7c93b2"
+    WHITE_KEY = "#f5f7fa"
+    WHITE_KEY_DISABLED = "#d8dee6"
+    BLACK_KEY = "#3f4a58"
+    BLACK_KEY_DISABLED = "#596474"
+    KEY_ACTIVE = "#84a9d6"
+    DARK_TEXT = "#111827"
+
     WHITE_KEYS = ["A", "S", "D", "F", "G", "H", "J", "K"]
     BLACK_KEYS = ["W", "E", "T", "Y", "U"]
     KEY_ORDER = ["A", "W", "S", "E", "D", "F", "T", "G", "Y", "H", "U", "J", "K"]
@@ -251,7 +445,7 @@ class SynthMockUI:
         self.root = tk.Tk()
         self.root.title("CS375 Synthesizer UI Mockup")
         self.root.geometry("1220x760")
-        self.root.configure(bg="#f2efe8")
+        self.root.configure(bg=self.BASE_BG)
         self.root.minsize(1080, 700)
 
         self.audio_engine = SynthAudioEngine()
@@ -288,18 +482,47 @@ class SynthMockUI:
     def _configure_styles(self):
         style = ttk.Style()
         style.theme_use("clam")
-        style.configure("Card.TFrame", background="#fffaf2")
-        style.configure("Header.TLabel", font=("Georgia", 22, "bold"), background="#f2efe8", foreground="#1f2933")
-        style.configure("Sub.TLabel", font=("Segoe UI", 10), background="#f2efe8", foreground="#52606d")
-        style.configure("CardTitle.TLabel", font=("Segoe UI", 11, "bold"), background="#fffaf2", foreground="#1f2933")
-        style.configure("CardBody.TLabel", font=("Segoe UI", 10), background="#fffaf2", foreground="#334e68")
-        style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"))
+        style.configure("Card.TFrame", background=self.BASE_BG)
+        style.configure("Header.TLabel", font=("Georgia", 22, "bold"), background=self.BASE_BG, foreground=self.TEXT_COLOR)
+        style.configure("Sub.TLabel", font=("Segoe UI", 10), background=self.BASE_BG, foreground=self.MUTED_TEXT)
+        style.configure("CardTitle.TLabel", font=("Segoe UI", 11, "bold"), background=self.CARD_BG, foreground=self.TEXT_COLOR)
+        style.configure("CardBody.TLabel", font=("Segoe UI", 10), background=self.CARD_BG, foreground=self.MUTED_TEXT)
+        style.configure("CardTitleAlt.TLabel", font=("Segoe UI", 11, "bold"), background=self.CARD_ALT_BG, foreground=self.TEXT_COLOR)
+        style.configure("CardBodyAlt.TLabel", font=("Segoe UI", 10), background=self.CARD_ALT_BG, foreground=self.MUTED_TEXT)
+        style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"), background=self.CARD_BG, foreground=self.TEXT_COLOR)
+        style.configure(
+            "TCombobox",
+            fieldbackground=self.WHITE_KEY,
+            background=self.WHITE_KEY,
+            foreground=self.DARK_TEXT,
+            arrowcolor=self.DARK_TEXT,
+        )
+        style.map(
+            "TCombobox",
+            fieldbackground=[("readonly", self.WHITE_KEY), ("focus", self.WHITE_KEY)],
+            foreground=[("readonly", self.DARK_TEXT), ("focus", self.DARK_TEXT)],
+            selectbackground=[("readonly", self.WHITE_KEY), ("focus", self.WHITE_KEY)],
+            selectforeground=[("readonly", self.DARK_TEXT), ("focus", self.DARK_TEXT)],
+        )
+        style.configure("TEntry", fieldbackground=self.BASE_BG, foreground=self.TEXT_COLOR, insertcolor=self.TEXT_COLOR)
+        style.map(
+            "TEntry",
+            fieldbackground=[("focus", self.BASE_BG)],
+            foreground=[("focus", self.TEXT_COLOR)],
+            selectbackground=[("focus", self.ACCENT)],
+            selectforeground=[("focus", self.DARK_TEXT)],
+        )
+        style.configure("TScrollbar", background=self.CARD_BG, troughcolor=self.PANEL_BG, arrowcolor=self.TEXT_COLOR)
+        self.root.option_add("*TCombobox*Listbox.background", self.WHITE_KEY)
+        self.root.option_add("*TCombobox*Listbox.foreground", self.DARK_TEXT)
+        self.root.option_add("*TCombobox*Listbox.selectBackground", self.ACCENT)
+        self.root.option_add("*TCombobox*Listbox.selectForeground", self.DARK_TEXT)
 
     def _build_layout(self):
         outer = ttk.Frame(self.root, padding=20, style="Card.TFrame")
         outer.pack(fill="both", expand=True, padx=18, pady=18)
 
-        header = ttk.Frame(self.root)
+        header = tk.Frame(self.root, bg=self.BASE_BG)
         header.place(x=32, y=22)
 
         ttk.Label(header, text="Synthesizer UI!! :D", style="Header.TLabel").pack(anchor="w")
@@ -309,26 +532,26 @@ class SynthMockUI:
             style="Sub.TLabel",
         ).pack(anchor="w", pady=(2, 0))
 
-        content = tk.Frame(outer, bg="#fffaf2")
+        content = tk.Frame(outer, bg=self.BASE_BG)
         content.pack(fill="both", expand=True)
 
-        left_panel = tk.Frame(content, bg="#fffaf2", width=330)
+        left_panel = tk.Frame(content, bg=self.PANEL_BG, width=330)
         left_panel.pack(side="left", fill="y", padx=(8, 20), pady=(52, 8))
         left_panel.pack_propagate(False)
 
-        right_panel = tk.Frame(content, bg="#fffaf2")
+        right_panel = tk.Frame(content, bg=self.BASE_BG)
         right_panel.pack(side="left", fill="both", expand=True, pady=(52, 8))
 
         self._build_scrollable_controls(left_panel)
         self._build_keyboard(right_panel)
 
     def _build_scrollable_controls(self, parent):
-        canvas_holder = tk.Frame(parent, bg="#fffaf2")
+        canvas_holder = tk.Frame(parent, bg=self.PANEL_BG)
         canvas_holder.pack(fill="both", expand=True)
 
         self.controls_canvas = tk.Canvas(
             canvas_holder,
-            bg="#fffaf2",
+            bg=self.PANEL_BG,
             highlightthickness=0,
             bd=0,
         )
@@ -338,7 +561,7 @@ class SynthMockUI:
         scrollbar.pack(side="right", fill="y")
         self.controls_canvas.pack(side="left", fill="both", expand=True)
 
-        self.controls_inner = tk.Frame(self.controls_canvas, bg="#fffaf2")
+        self.controls_inner = tk.Frame(self.controls_canvas, bg=self.PANEL_BG)
         self.controls_window = self.controls_canvas.create_window((0, 0), window=self.controls_inner, anchor="nw")
 
         self.controls_inner.bind("<Configure>", self._update_controls_scrollregion)
@@ -374,7 +597,7 @@ class SynthMockUI:
             self.controls_canvas.yview_scroll(scroll_units, "units")
 
     def _build_controls(self, parent):
-        config_card = tk.Frame(parent, bg="#f8f2e7", bd=0, highlightthickness=1, highlightbackground="#dfd2bd")
+        config_card = tk.Frame(parent, bg=self.CARD_BG, bd=0, highlightthickness=1, highlightbackground=self.ACCENT)
         config_card.pack(fill="x", pady=(0, 14))
 
         ttk.Label(config_card, text="Preset + Mapping", style="CardTitle.TLabel").pack(anchor="w", padx=14, pady=(14, 4))
@@ -400,14 +623,14 @@ class SynthMockUI:
             command=self._apply_settings,
         ).pack(fill="x", padx=14, pady=(0, 14))
 
-        wavetable_card = tk.Frame(parent, bg="#edf2f7", bd=0, highlightthickness=1, highlightbackground="#cbd2d9")
+        wavetable_card = tk.Frame(parent, bg=self.CARD_ALT_BG, bd=0, highlightthickness=1, highlightbackground=self.ACCENT)
         wavetable_card.pack(fill="x", pady=(0, 14))
 
-        ttk.Label(wavetable_card, text="WaveTable", style="CardTitle.TLabel").pack(anchor="w", padx=14, pady=(14, 4))
+        ttk.Label(wavetable_card, text="WaveTable", style="CardTitleAlt.TLabel").pack(anchor="w", padx=14, pady=(14, 4))
         ttk.Label(
             wavetable_card,
-            text="These sliders mirror WaveTable duration, gain, attack, and release.",
-            style="CardBody.TLabel",
+            text="Gain affects live volume; duration and sample fades are legacy wavetable controls.",
+            style="CardBodyAlt.TLabel",
             wraplength=280,
         ).pack(anchor="w", padx=14, pady=(0, 10))
 
@@ -416,7 +639,7 @@ class SynthMockUI:
         self._build_slider(wavetable_card, "Attack (samples)", "wavetable_attack", 0, 5000, 1000, 0)
         self._build_slider(wavetable_card, "Release (samples)", "wavetable_release", 0, 5000, 3000, 0)
 
-        envelope_card = tk.Frame(parent, bg="#f4efe6", bd=0, highlightthickness=1, highlightbackground="#d7c7af")
+        envelope_card = tk.Frame(parent, bg=self.CARD_BG, bd=0, highlightthickness=1, highlightbackground=self.ACCENT)
         envelope_card.pack(fill="x", pady=(0, 14))
 
         ttk.Label(envelope_card, text="Envelope", style="CardTitle.TLabel").pack(anchor="w", padx=14, pady=(14, 4))
@@ -432,17 +655,17 @@ class SynthMockUI:
         self._build_slider(envelope_card, "Sustain", "env_sustain", 0.0, 1.0, 1.0, 2)
         self._build_slider(envelope_card, "Release (seconds)", "env_release", 0.0, 5.0, 0.25, 2)
 
-        status_card = tk.Frame(parent, bg="#e8f1eb", bd=0, highlightthickness=1, highlightbackground="#b7d0be")
+        status_card = tk.Frame(parent, bg=self.CARD_ALT_BG, bd=0, highlightthickness=1, highlightbackground=self.ACCENT)
         status_card.pack(fill="x")
 
-        ttk.Label(status_card, text="Status", style="CardTitle.TLabel").pack(anchor="w", padx=14, pady=(14, 6))
-        ttk.Label(status_card, textvariable=self.status_var, style="CardBody.TLabel", wraplength=280).pack(anchor="w", padx=14)
-        ttk.Label(status_card, textvariable=self.current_key_var, style="CardBody.TLabel", wraplength=280).pack(
+        ttk.Label(status_card, text="Status", style="CardTitleAlt.TLabel").pack(anchor="w", padx=14, pady=(14, 6))
+        ttk.Label(status_card, textvariable=self.status_var, style="CardBodyAlt.TLabel", wraplength=280).pack(anchor="w", padx=14)
+        ttk.Label(status_card, textvariable=self.current_key_var, style="CardBodyAlt.TLabel", wraplength=280).pack(
             anchor="w",
             padx=14,
             pady=(6, 4),
         )
-        ttk.Label(status_card, textvariable=self.recording_var, style="CardBody.TLabel", wraplength=280).pack(
+        ttk.Label(status_card, textvariable=self.recording_var, style="CardBodyAlt.TLabel", wraplength=280).pack(
             anchor="w",
             padx=14,
             pady=(0, 10),
@@ -482,12 +705,12 @@ class SynthMockUI:
         label_row = tk.Frame(row, bg=parent["bg"])
         label_row.pack(fill="x")
 
-        tk.Label(label_row, text=label_text, bg=parent["bg"], fg="#1f2933", font=("Segoe UI", 10)).pack(side="left")
+        tk.Label(label_row, text=label_text, bg=parent["bg"], fg=self.TEXT_COLOR, font=("Segoe UI", 10)).pack(side="left")
         value_label = tk.Label(
             label_row,
             text=self._format_slider_value(value, decimals),
             bg=parent["bg"],
-            fg="#52606d",
+            fg=self.MUTED_TEXT,
             font=("Segoe UI", 9),
         )
         value_label.pack(side="right")
@@ -508,30 +731,30 @@ class SynthMockUI:
         )
 
     def _build_keyboard(self, parent):
-        title_row = tk.Frame(parent, bg="#fffaf2")
+        title_row = tk.Frame(parent, bg=self.BASE_BG)
         title_row.pack(fill="x", pady=(0, 12))
 
         tk.Label(
             title_row,
             text="Keyboard Mockup",
-            bg="#fffaf2",
-            fg="#1f2933",
+            bg=self.BASE_BG,
+            fg=self.TEXT_COLOR,
             font=("Georgia", 16, "bold"),
         ).pack(anchor="w")
         tk.Label(
             title_row,
             text="Mapped keys light up when pressed and trigger the current note settings.",
-            bg="#fffaf2",
-            fg="#52606d",
+            bg=self.BASE_BG,
+            fg=self.MUTED_TEXT,
             font=("Segoe UI", 10),
             wraplength=700,
             justify="left",
         ).pack(anchor="w", pady=(4, 0))
 
-        keyboard_frame = tk.Frame(parent, bg="#d9cab3", padx=18, pady=18)
+        keyboard_frame = tk.Frame(parent, bg=self.BASE_BG, padx=18, pady=18, highlightthickness=1, highlightbackground=self.ACCENT)
         keyboard_frame.pack(fill="both", expand=True)
 
-        black_row = tk.Frame(keyboard_frame, bg="#d9cab3", height=110)
+        black_row = tk.Frame(keyboard_frame, bg=self.BASE_BG, height=110)
         black_row.pack(fill="x")
 
         for column in range(15):
@@ -542,8 +765,8 @@ class SynthMockUI:
             button = tk.Label(
                 black_row,
                 text=self._format_key_label(key_name),
-                bg="#1f2933",
-                fg="#fffaf2",
+                bg=self.BLACK_KEY,
+                fg=self.TEXT_COLOR,
                 width=8,
                 height=6,
                 relief="flat",
@@ -555,7 +778,7 @@ class SynthMockUI:
             self.key_widgets[key_name] = button
             self._bind_mouse_events(button, key_name)
 
-        white_row = tk.Frame(keyboard_frame, bg="#d9cab3")
+        white_row = tk.Frame(keyboard_frame, bg=self.BASE_BG)
         white_row.pack(fill="x", pady=(8, 0))
 
         for column, key_name in enumerate(self.WHITE_KEYS):
@@ -563,8 +786,8 @@ class SynthMockUI:
             button = tk.Label(
                 white_row,
                 text=self._format_key_label(key_name),
-                bg="#fffaf2",
-                fg="#1f2933",
+                bg=self.WHITE_KEY,
+                fg=self.DARK_TEXT,
                 width=8,
                 height=9,
                 relief="solid",
@@ -647,10 +870,9 @@ class SynthMockUI:
 
     def _play_note_for_key(self, key_name, frequency):
         try:
-            signal = self.audio_engine.play_note(frequency, self._get_audio_settings())
-            self.last_rendered_signal = np.array(signal, copy=True)
+            self.audio_engine.note_on(key_name, frequency, self._get_audio_settings())
+            self.last_rendered_signal = None
             self.last_rendered_frequency = frequency
-            self._record_note_signal(signal)
             solfege = self.key_note_labels.get(key_name, self.KEY_SOLFEGE.get(key_name, key_name))
             self.status_var.set(f"Pressed {key_name} ({solfege}) at {frequency:.2f} Hz.")
         except Exception as error:
@@ -661,6 +883,7 @@ class SynthMockUI:
             return
 
         self.key_input.on_release(key_name)
+        self.audio_engine.note_off(key_name)
         self._set_key_visual(key_name, False)
         self.status_var.set(f"Released {key_name}")
         self._update_active_notes_label()
@@ -672,12 +895,12 @@ class SynthMockUI:
 
         is_mapped = key_name in self.key_input.key_map
         if key_name in self.BLACK_KEYS:
-            default_bg = "#1f2933" if is_mapped else "#5f6c7b"
-            default_fg = "#fffaf2" if is_mapped else "#d9e2ec"
-            widget.configure(bg="#ff9f1c" if pressed else default_bg, fg="#1f2933" if pressed else default_fg)
+            default_bg = self.BLACK_KEY if is_mapped else self.BLACK_KEY_DISABLED
+            default_fg = self.TEXT_COLOR if is_mapped else self.MUTED_TEXT
+            widget.configure(bg=self.KEY_ACTIVE if pressed else default_bg, fg=self.DARK_TEXT if pressed else default_fg)
         else:
-            default_bg = "#fffaf2" if is_mapped else "#e4e7eb"
-            widget.configure(bg="#7bd389" if pressed else default_bg, fg="#1f2933")
+            default_bg = self.WHITE_KEY if is_mapped else self.WHITE_KEY_DISABLED
+            widget.configure(bg=self.KEY_ACTIVE if pressed else default_bg, fg=self.DARK_TEXT)
 
     def _update_active_notes_label(self):
         current_key = self.key_input.last_pressed_key
@@ -732,8 +955,14 @@ class SynthMockUI:
             self.status_var.set("Recording is already running.")
             return
 
+        try:
+            self.audio_engine.start_recording()
+        except Exception as error:
+            self.status_var.set(f"Recording error: {error}")
+            return
+
         self.recording_active = True
-        self.recording_start_time = time.monotonic()
+        self.recording_start_time = None
         self.recorded_signal = np.zeros(0, dtype=np.float32)
         self.recording_has_audio = False
         self.recording_var.set("Recording: active")
@@ -747,7 +976,8 @@ class SynthMockUI:
                 self.status_var.set("Start recording before stopping.")
             return
 
-        self._finalize_recording_length()
+        self.recorded_signal = self.audio_engine.stop_recording()
+        self.recording_has_audio = self.audio_engine.recording_has_audio and self.recorded_signal.size > 0
         self.recording_active = False
         self.recording_start_time = None
 
@@ -787,36 +1017,12 @@ class SynthMockUI:
         except Exception as error:
             self.status_var.set(f"Save error: {error}")
 
-    def _record_note_signal(self, signal):
-        if not self.recording_active or self.recording_start_time is None:
-            return
-
-        start_sample = int(max(0.0, time.monotonic() - self.recording_start_time) * SAMPLE_RATE)
-        end_sample = start_sample + len(signal)
-
-        if end_sample > self.recorded_signal.size:
-            extended = np.zeros(end_sample, dtype=np.float32)
-            if self.recorded_signal.size > 0:
-                extended[: self.recorded_signal.size] = self.recorded_signal
-            self.recorded_signal = extended
-
-        self.recorded_signal[start_sample:end_sample] += np.asarray(signal, dtype=np.float32)
-        self.recording_has_audio = True
-        self.recording_var.set("Recording: active")
-
-    def _finalize_recording_length(self):
-        if self.recording_start_time is None:
-            return
-
-        elapsed_samples = int(max(0.0, time.monotonic() - self.recording_start_time) * SAMPLE_RATE)
-        if elapsed_samples > self.recorded_signal.size:
-            extended = np.zeros(elapsed_samples, dtype=np.float32)
-            if self.recorded_signal.size > 0:
-                extended[: self.recorded_signal.size] = self.recorded_signal
-            self.recorded_signal = extended
-
     def _write_wav_file(self, target_path, signal):
-        audio = np.clip(np.asarray(signal, dtype=np.float32), -1.0, 1.0)
+        audio = np.asarray(signal, dtype=np.float32)
+        peak = np.max(np.abs(audio)) if audio.size > 0 else 0.0
+        if peak > 1.0:
+            audio = audio / peak
+        audio = np.clip(audio, -1.0, 1.0)
         pcm_audio = np.int16(audio * 32767)
         with wave.open(target_path, "wb") as wav_file:
             wav_file.setnchannels(1)
@@ -847,11 +1053,12 @@ class SynthMockUI:
         for key_name in list(self.key_input.active_keys):
             self._set_key_visual(key_name, False)
         self.key_input.clear_active_keys()
+        self.audio_engine.clear_voices()
         self._update_active_notes_label()
 
     def _close(self):
         self.stop_listener()
-        sd.stop()
+        self.audio_engine.close()
         self.root.destroy()
 
     def run(self):
