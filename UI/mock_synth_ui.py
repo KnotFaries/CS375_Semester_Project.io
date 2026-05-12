@@ -823,27 +823,26 @@ class SynthMockUI:
             return
 
         scale_type = self.scale_var.get()
-        scale = self.audio_engine.calculate_scale(typed_value, "chroma")
-        note_entries = self._build_note_entries(typed_value, "chroma", scale)
+        note_entries = self._build_note_entries(typed_value, scale_type)
         self.key_note_labels = {note["key"]: note["solfege"] for note in note_entries}
         self.key_input.setup_key_map(note_entries)
         self.clear_active_keys()
         self._refresh_keyboard_labels()
         self.status_var.set(
-            f"Loaded all keyboard notes from {typed_value:.2f} Hz with {self.waveform_var.get()} waveform."
+            f"Loaded {scale_type} scale from {typed_value:.2f} Hz with {self.waveform_var.get()} waveform."
         )
         self._update_active_notes_label()
 
-    def _build_note_entries(self, base_frequency, scale_type, scale):
+    def _build_note_entries(self, base_frequency, scale_type):
         degrees = self.SCALE_DEGREES.get(scale_type, self.SCALE_DEGREES["chroma"])
-        frequencies = list(scale)
-
-        for semitone, _solfege in degrees[len(frequencies) :]:
-            frequencies.append(base_frequency * (2 ** (semitone / 12)))
+        repeating_degrees = degrees[:-1] if degrees and degrees[-1][0] == 12 else degrees
 
         note_entries = []
-        for (semitone, solfege), frequency in zip(degrees, frequencies):
-            key_name = self.KEY_FOR_SEMITONE[semitone]
+        for index, key_name in enumerate(self.KEY_ORDER):
+            octave_offset, scale_index = divmod(index, len(repeating_degrees))
+            semitone, solfege = repeating_degrees[scale_index]
+            total_semitones = semitone + (12 * octave_offset)
+            frequency = base_frequency * (2 ** (total_semitones / 12))
             note_entries.append(
                 {
                     "key": key_name,
